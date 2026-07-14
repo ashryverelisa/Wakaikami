@@ -1,3 +1,22 @@
 <Solution>
-  <Project Path="Wakaikami/Wakaikami.csproj" />
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/Database/">
+    <Project Path="Wakaikami.Database/Wakaikami.Database.csproj" />
+  </Folder>
+  <Folder Name="/Library/">
+    <Project Path="Wakaikami.Content/Wakaikami.Content.csproj" />
+    <Project Path="Wakaikami.Core/Wakaikami.Core.csproj" />
+    <Project Path="Wakaikami.Networking.Grpc/Wakaikami.Networking.Grpc.csproj" />
+    <Project Path="Wakaikami.Networking/Wakaikami.Networking.csproj" />
+  </Folder>
+  <Folder Name="/Services/">
+    <Project Path="Wakaikami.LoginService/Wakaikami.LoginService.csproj" />
+    <Project Path="Wakaikami.WorldService/Wakaikami.WorldService.csproj" />
+    <Project Path="Wakaikami.ZoneService/Wakaikami.ZoneService.csproj" />
+  </Folder>
+  <Folder Name="/UnitTests/" />
+  <Project Path="Wakaikami.AppHost/Wakaikami.AppHost.csproj" />
 </Solution>

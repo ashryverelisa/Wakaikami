@@ -1,0 +1,17 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework Condition="'$(TargetFrameworkVersion)' == ''">net10.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <AnalysisLevel>latest-recommended</AnalysisLevel>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <UseArtifactsOutput>true</UseArtifactsOutput>
+        <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
+        <DefaultItemExcludes>$(DefaultItemExcludes);**/TestResults/**</DefaultItemExcludes>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
+        <RunSettingsFilePath>$(MSBuildThisFileDirectory)coverlet.runsettings</RunSettingsFilePath>
+    </PropertyGroup>
+    
+</Project>
