@@ -2,7 +2,7 @@
 
 namespace Wakaikami.Core.Hosting.Interfaces;
 
-public interface IServerModule : IModule<InitializationStage>
+public interface IGameServerModule : IModule<GameInitialStage>
 {
     public Task<bool> InitializeAsync(CancellationToken cancellationToken);
 }

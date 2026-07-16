@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Wakaikami.Core.Enums;
+using Wakaikami.Core.Hosting.Enums;
 
 namespace Wakaikami.Core.Hosting.Interfaces;
 

@@ -1,4 +1,4 @@
-﻿namespace Wakaikami.Core.Enums;
+﻿namespace Wakaikami.Core.Hosting.Enums;
 
 public enum InitialType
 {
