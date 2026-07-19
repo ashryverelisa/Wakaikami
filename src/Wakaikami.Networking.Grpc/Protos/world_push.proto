@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package wakaikami.grpc.world_push;
+
+import "push_kinds.proto";
+
+option csharp_namespace = "Wakaikami.Networking.Grpc.Messages.WorldPush";
+
+service WorldPushStream {
+  rpc Subscribe(WorldSubscribeRequest) returns (stream WorldPush);
+}
+
+message WorldSubscribeRequest {
+  int32 world_id = 1;
+}
+
+message WorldPush {
+  wakaikami.grpc.enums.WorldPushKind kind = 1;
+  AccountStateFailedPush account_state_failed = 2;
+}
+
+message AccountStateFailedPush {
+  int32 account_id = 1;
+}

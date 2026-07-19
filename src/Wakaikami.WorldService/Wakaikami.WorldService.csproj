@@ -8,5 +8,24 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
+    <PackageReference Include="Grpc.AspNetCore.Server" />
+    <PackageReference Include="Grpc.Net.Client" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wakaikami.Core\Wakaikami.Core.csproj" />
+    <ProjectReference Include="..\Wakaikami.LoginService\Wakaikami.LoginService.csproj" />
+    <ProjectReference Include="..\Wakaikami.Networking.Grpc\Wakaikami.Networking.Grpc.csproj" />
+    <ProjectReference Include="..\Wakaikami.Networking\Wakaikami.Networking.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

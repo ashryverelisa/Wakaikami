@@ -12,4 +12,10 @@
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.SqlServer" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wakaikami.LoginService\Wakaikami.LoginService.csproj" />
+    <ProjectReference Include="..\Wakaikami.WorldService\Wakaikami.WorldService.csproj" />
+    <ProjectReference Include="..\Wakaikami.ZoneService\Wakaikami.ZoneService.csproj" />
+  </ItemGroup>
 </Project>

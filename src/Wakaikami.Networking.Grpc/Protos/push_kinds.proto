@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package wakaikami.grpc.enums;
+
+option csharp_namespace = "Wakaikami.Networking.Grpc.Enums";
+
+enum WorldPushKind {
+  WORLD_PUSH_KIND_UNSPECIFIED = 0;
+  WORLD_PUSH_KIND_ACCOUNT_STATE_FAILED = 1;
+  WORLD_PUSH_KIND_HEARTBEAT = 2;
+}
+
+enum ZonePushKind {
+  ZONE_PUSH_KIND_UNSPECIFIED = 0;
+  ZONE_PUSH_KIND_HEARTBEAT = 1;
+}

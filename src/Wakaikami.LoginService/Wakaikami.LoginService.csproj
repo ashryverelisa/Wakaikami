@@ -13,8 +13,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Wakaikami.Content\Wakaikami.Content.csproj" />
     <ProjectReference Include="..\Wakaikami.Core\Wakaikami.Core.csproj" />
     <ProjectReference Include="..\Wakaikami.Networking.Grpc\Wakaikami.Networking.Grpc.csproj" />
     <ProjectReference Include="..\Wakaikami.Networking\Wakaikami.Networking.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

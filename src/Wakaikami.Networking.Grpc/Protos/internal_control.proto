@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package wakaikami.grpc.internal_control;
+
+option csharp_namespace = "Wakaikami.Networking.Grpc.Messages.InternalControl";
+
+service InternalControl {
+  rpc Ping(PingRequest) returns (PingReply);
+}
+
+message PingRequest {
+  string caller = 1;
+}
+
+message PingReply {
+  int64 server_time_unix_ms = 1;
+}

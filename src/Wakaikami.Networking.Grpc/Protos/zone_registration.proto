@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package wakaikami.grpc.zone_registration;
+
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "Wakaikami.Networking.Grpc.Messages.ZoneRegistration";
+
+service ZoneRegistration {
+  rpc RegisterZone(RegisterZoneRequest) returns (RegisterZoneReply);
+  rpc ZoneSync(ZoneSyncRequest) returns (google.protobuf.Empty);
+}
+
+message RegisterZoneRequest {
+  int32 zone_id = 1;
+  string connect_ip = 2;
+  int32 connect_port = 3;
+  int32 max_player = 4;
+  bool is_test_server = 5;
+}
+
+message RegisterZoneReply {
+  bool accepted = 1;
+}
+
+message ZoneSyncRequest {
+  int32 zone_id = 1;
+  int32 now_players = 2;
+}

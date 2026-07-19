@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.Extensions.Hosting;
+using Wakaikami.Networking.Grpc.Extensions;
 
-var builder = WebApplication.CreateBuilder();
+var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings { ContentRootPath = AppContext.BaseDirectory });
 
-var app = builder.Build();
+builder.AddOpenTelemetryLogging();
 
-await app.RunAsync();
+var host = builder.Build();
+
+await host.RunAsync(CancellationToken.None);

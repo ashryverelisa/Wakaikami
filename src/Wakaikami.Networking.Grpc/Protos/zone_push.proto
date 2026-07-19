@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package wakaikami.grpc.zone_push;
+
+import "push_kinds.proto";
+
+option csharp_namespace = "Wakaikami.Networking.Grpc.Messages.ZonePush";
+
+service ZonePushStream {
+  rpc Subscribe(ZoneSubscribeRequest) returns (stream ZonePush);
+}
+
+message ZoneSubscribeRequest {
+  int32 zone_id = 1;
+}
+
+// Envelope for every World -> Zone push; kind selects which payload is set.
+message ZonePush {
+  wakaikami.grpc.enums.ZonePushKind kind = 1;
+}
+
+// World -> Zone (0x06): map index + instance id used by the map start/stop pushes.
+message MapRef {
+  string map_index = 1;
+  int32 instance_id = 2;
+}
+
+// World -> Zone: start this set of maps (sent on zone start).
+message MapStartListPush {
+  repeated MapRef maps = 1;
+}
+
+// World -> Zone: start a single map.
+message MapStartPush {
+  MapRef map = 1;
+}
+
+// World -> Zone: stop a single map.
+message MapStopPush {
+  MapRef map = 1;
+}

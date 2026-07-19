@@ -12,4 +12,8 @@
     <PackageReference Include="Grpc.Tools" PrivateAssets="all" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Protos\**\*.proto" GrpcServices="Both" ProtoRoot="Protos" />
+  </ItemGroup>
 </Project>
