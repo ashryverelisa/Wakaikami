@@ -17,6 +17,8 @@
     <Project Path="Wakaikami.WorldService/Wakaikami.WorldService.csproj" />
     <Project Path="Wakaikami.ZoneService/Wakaikami.ZoneService.csproj" />
   </Folder>
-  <Folder Name="/UnitTests/" />
+  <Folder Name="/UnitTests/">
+    <Project Path="Wakaikami.Networking.Tests/Wakaikami.Networking.Tests.csproj" />
+  </Folder>
   <Project Path="Wakaikami.AppHost/Wakaikami.AppHost.csproj" />
 </Solution>
