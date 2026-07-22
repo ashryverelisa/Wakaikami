@@ -211,3 +211,4 @@ FakesAssemblies/
 .idea/
 
 */appsettings.Development.json
+*/migrator.appsettings.Development.json

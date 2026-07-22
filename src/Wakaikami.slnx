@@ -4,6 +4,7 @@
     <File Path="Directory.Packages.props" />
   </Folder>
   <Folder Name="/Database/">
+    <Project Path="Wakaikami.Database.Migrations/Wakaikami.Database.Migrations.csproj" />
     <Project Path="Wakaikami.Database/Wakaikami.Database.csproj" />
   </Folder>
   <Folder Name="/Library/">
