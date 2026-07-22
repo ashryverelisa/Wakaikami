@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package wakaikami.grpc.world_login_account;
+
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "Wakaikami.Networking.Grpc.Messages.WorldLoginAccount";
+
+service WorldLoginAccount {
+  rpc AccountOffline(AccountOfflineRequest) returns (google.protobuf.Empty);
+  rpc AccountOnlineList(AccountOnlineListRequest) returns (google.protobuf.Empty);
+  rpc TransferGen(TransferGenRequest) returns (TransferGenReply);
+  rpc TransferGet(TransferGetRequest) returns (TransferGetReply);
+}
+
+message TransferGenRequest {
+  int32 account_id = 1;
+  string account_name = 2;
+}
+
+message AccountOfflineRequest {
+  int32 account_id = 1;
+  int32 world_id = 2;
+}
+
+message AccountOnlineListRequest {
+  repeated int32 account_ids = 1;
+  int32 world_id = 2;
+}
+
+message TransferGenReply {
+  string auth_id = 1;
+  bool success = 2;
+}
+
+message TransferGetRequest {
+  string transfer_id = 1;
+  string account_name = 2;
+  int32 world_id = 3;
+}
+
+message TransferGetReply {
+  bool found = 1;
+  int32 account_id = 2;
+  string account_name = 3;
+}

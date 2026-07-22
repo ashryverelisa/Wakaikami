@@ -15,8 +15,14 @@
   <ItemGroup>
     <ProjectReference Include="..\Wakaikami.Content\Wakaikami.Content.csproj" />
     <ProjectReference Include="..\Wakaikami.Core\Wakaikami.Core.csproj" />
+    <ProjectReference Include="..\Wakaikami.Database\Wakaikami.Database.csproj" />
     <ProjectReference Include="..\Wakaikami.Networking.Grpc\Wakaikami.Networking.Grpc.csproj" />
     <ProjectReference Include="..\Wakaikami.Networking\Wakaikami.Networking.csproj" />
+    <ProjectReference
+      Include="..\Wakaikami.Networking.Generators\Wakaikami.Networking.Generators.csproj"
+      OutputItemType="Analyzer"
+      ReferenceOutputAssembly="false"
+    />
   </ItemGroup>
 
   <ItemGroup>

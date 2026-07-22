@@ -3,10 +3,14 @@ using System.Diagnostics.CodeAnalysis;
 using Wakaikami.Content.Account;
 using Wakaikami.Core.Time;
 using Wakaikami.Core.Updates;
+using Wakaikami.LoginService.Content.Account;
+using Wakaikami.LoginService.Content.Account.Interfaces;
+using Wakaikami.LoginService.GameNetwork.Protocol.User;
+using Wakaikami.LoginService.GameNetwork.Protocol.User.Server;
 
 namespace Wakaikami.LoginService.Content.Transfer;
 
-public sealed class AccountTransferManager(UpdateManager updateManager)
+public sealed class AccountTransferManager(UpdateManager updateManager, IAccountPresence presence)
 {
     private const int TransferTimeoutSeconds = 10;
 
@@ -50,9 +54,14 @@ public sealed class AccountTransferManager(UpdateManager updateManager)
         if (tf.Session?.IsConnected != true)
             return;
 
-        // TODO: check Send Login failed to client?
+        if (tf.Session?.IsConnected == true)
+        {
+            tf.Session.SendPacket(new NcUserLoginFailAck(UserErrors.LoginTimeout));
+            tf.Session.Dispose();
+            return;
+        }
 
-        tf.Session.Dispose();
+        presence.ReleaseIfOwnedBy(tf.Account.Id, PresenceOwner.Login);
     }
 
     private void Remove(AccountTransfer tf)
