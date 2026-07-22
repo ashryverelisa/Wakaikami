@@ -1,0 +1,6 @@
+{
+  "ConnectionStrings": {
+    "Login": "Server=localhost,52555;Database=Auth;User Id=sa;TrustServerCertificate=True;MultipleActiveResultSets=True;",
+    "World": "Server=localhost,52555;Database=World;User Id=sa;TrustServerCertificate=True;MultipleActiveResultSets=True;"
+  }
+}
