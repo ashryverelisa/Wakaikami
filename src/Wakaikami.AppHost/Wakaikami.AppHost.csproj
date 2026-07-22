@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Wakaikami.Database.Migrations\Wakaikami.Database.Migrations.csproj" />
     <ProjectReference Include="..\Wakaikami.LoginService\Wakaikami.LoginService.csproj" />
+    <ProjectReference Include="..\Wakaikami.Web\Wakaikami.Web.csproj" />
     <ProjectReference Include="..\Wakaikami.WorldService\Wakaikami.WorldService.csproj" />
     <ProjectReference Include="..\Wakaikami.ZoneService\Wakaikami.ZoneService.csproj" />
   </ItemGroup>

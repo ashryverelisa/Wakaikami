@@ -26,4 +26,6 @@ var world = builder
 
 var zone = builder.AddProject<Wakaikami_ZoneService>("zone-service").WithEnvironment("Grpc__WorldEndpoint", world.GetEndpoint("grpc-intern")).WaitFor(world);
 
+builder.AddProject<Wakaikami_Web>("web").WaitForCompletion(migrator);
+
 builder.Build().Run();

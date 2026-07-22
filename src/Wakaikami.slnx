@@ -22,4 +22,5 @@
     <Project Path="Wakaikami.Networking.Tests/Wakaikami.Networking.Tests.csproj" />
   </Folder>
   <Project Path="Wakaikami.AppHost/Wakaikami.AppHost.csproj" />
+  <Project Path="Wakaikami.Web/Wakaikami.Web.csproj" />
 </Solution>
