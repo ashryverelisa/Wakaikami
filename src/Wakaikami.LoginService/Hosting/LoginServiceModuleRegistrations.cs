@@ -8,6 +8,7 @@ using Wakaikami.Core.Extensions;
 using Wakaikami.Core.Hosting;
 using Wakaikami.Core.Hosting.Enums;
 using Wakaikami.Core.Hosting.Interfaces;
+using Wakaikami.Core.Security;
 using Wakaikami.LoginService.Configuration;
 using Wakaikami.LoginService.Content.Account;
 using Wakaikami.LoginService.Content.Account.Interfaces;
@@ -25,7 +26,7 @@ public class LoginServiceModuleRegistrations : IServiceRegistrar
     {
         services.AddSingletonAs<ServerMainBase, IServerLifecycle>();
 
-        services.AddDatabase(configuration, DatabaseType.Login, "Login:ConnectionString:AuthDb");
+        services.AddDatabase(configuration, DatabaseType.Login, "Login:ConnectionString:Login");
 
         services.AddSingleton<AccountTransferManager>();
 
@@ -37,6 +38,8 @@ public class LoginServiceModuleRegistrations : IServiceRegistrar
         ));
         services.AddHostedService(sp => sp.GetRequiredService<LoginSessionManager>());
 
+        services.AddPasswordHashing();
+        services.AddSingletonAs<AuthenticationService, IAuthenticationService>();
         services.AddSingletonAs<AccountManager, IAccountManager>();
         services.AddSingletonAs<AccountPresence, IAccountPresence>();
         services.AddSingletonAs<WorldServerManager, IWorldServerManager>();
