@@ -1,4 +1,6 @@
-﻿namespace Wakaikami.Database.Login.Entities;
+﻿using Wakaikami.Database.Login.Entities.Enums;
+
+namespace Wakaikami.Database.Login.Entities;
 
 public class Account
 {
@@ -10,4 +12,5 @@ public class Account
     public bool IsActivated { get; set; }
     public string? LastLoginIp { get; set; }
     public AccountBan? AccountBan { get; set; }
+    public AccountTypes AccountType { get; set; }
 }
