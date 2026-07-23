@@ -8,8 +8,6 @@ public class Account
     public DateTime CreateAt { get; set; }
     public required string CreationIp { get; set; }
     public bool IsActivated { get; set; }
-    public bool IsOnline { get; set; }
-    public DateTime? LastLoginAt { get; set; }
     public string? LastLoginIp { get; set; }
     public AccountBan? AccountBan { get; set; }
 }
