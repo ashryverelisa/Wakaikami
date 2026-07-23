@@ -14,6 +14,7 @@ var migrator = builder
 
 var login = builder
     .AddProject<Wakaikami_LoginService>("login-service")
+    .WithEnvironment("Login__ConnectionString__Login", loginDb)
     .WithEndpoint(port: 8500, targetPort: 8500, scheme: "https", name: "grpc-intern", isProxied: false)
     .WaitForCompletion(migrator);
 

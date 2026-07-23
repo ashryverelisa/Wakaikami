@@ -13,7 +13,7 @@ namespace Wakaikami.WorldService.Hosting;
 
 public sealed class WorldServiceModuleRegistrations : IServiceRegistrar
 {
-    public void Register(IServiceCollection services, InitialType initialType, IConfiguration configuration)
+    public void Register(IServiceCollection services, InitialType target, IConfiguration configuration)
     {
         services.AddSingletonAs<ServerMain, IServerLifecycle>();
 

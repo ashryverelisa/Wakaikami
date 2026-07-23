@@ -10,6 +10,7 @@
   <Folder Name="/Library/">
     <Project Path="Wakaikami.Content/Wakaikami.Content.csproj" />
     <Project Path="Wakaikami.Core/Wakaikami.Core.csproj" />
+    <Project Path="Wakaikami.Networking.Generators/Wakaikami.Networking.Generators.csproj" />
     <Project Path="Wakaikami.Networking.Grpc/Wakaikami.Networking.Grpc.csproj" />
     <Project Path="Wakaikami.Networking/Wakaikami.Networking.csproj" />
   </Folder>

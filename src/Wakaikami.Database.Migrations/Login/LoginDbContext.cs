@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Wakaikami.Database.Common.CustomMigrations;
 using Wakaikami.Database.Login.Entities;
+using Wakaikami.Database.Login.Entities.Enums;
 
 namespace Wakaikami.Database.Migrations.Login;
 
@@ -21,9 +22,9 @@ public class LoginDbContext(DbContextOptions<LoginDbContext> options) : Migratab
             entity.Property(x => x.Username).HasMaxLength(256);
             entity.Property(x => x.Password).HasMaxLength(256);
             entity.Property(x => x.CreationIp).HasMaxLength(15);
-            entity.Property(x => x.IsOnline).HasDefaultValue(value: false);
             entity.Property(x => x.IsActivated).HasDefaultValue(value: false);
             entity.Property(x => x.LastLoginIp).HasMaxLength(15);
+            entity.Property(x => x.AccountType).HasDefaultValue(AccountTypes.Player);
         });
 
         modelBuilder.Entity<AccountBan>(entity =>
