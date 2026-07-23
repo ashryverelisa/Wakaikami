@@ -9,6 +9,8 @@ namespace Wakaikami.LoginService.GameNetwork.Listening;
 
 public sealed class LoginSession(Socket pSocket, FiestaHandlerStore fiestaStore, ILogger logger) : AccountSession(pSocket, fiestaStore, logger)
 {
+    public int FailedLoginAttempts { get; set; }
+
     public override void SendHandShake() => SendPacket(new NcMiscSeedAck(Crypto.XorPosition));
 
     public override void Disconnect(bool notifyPeer)

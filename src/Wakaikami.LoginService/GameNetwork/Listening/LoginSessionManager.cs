@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Wakaikami.Content.Account;
 using Wakaikami.Core.Hosting.Enums;
 using Wakaikami.Core.Hosting.Interfaces;
+using Wakaikami.LoginService.Content.Account;
 using Wakaikami.LoginService.Content.Account.Interfaces;
 using Wakaikami.LoginService.Content.Transfer;
 using Wakaikami.LoginService.GameNetwork.Listening.Interfaces;
@@ -12,7 +13,7 @@ namespace Wakaikami.LoginService.GameNetwork.Listening;
 
 public sealed class LoginSessionManager(
     ushort maxConnections,
-    IAccountManager accountManager,
+    IAccountPresence presence,
     AccountTransferManager transferManager,
     ILogger<LoginSessionManager> logger
 ) : IdPooledSessionManager<LoginSession>(maxConnections, logger), ILoginSessionManager, IGameServerModule
@@ -34,12 +35,20 @@ public sealed class LoginSessionManager(
     public bool AddSession(LoginSession session, GameAccount account)
     {
         if (_sessionsByName.TryRemove(account.Name, out var existing))
-            existing.Disconnect(true);
+            existing.Disconnect(notifyPeer: true);
 
         if (!_sessionsByName.TryAdd(account.Name, session))
             return false;
 
         session.Account = account;
+
+        if (session.IsDisposed)
+        {
+            _sessionsByName.TryRemove(new KeyValuePair<string, LoginSession>(account.Name, session));
+            session.Account = null;
+            return false;
+        }
+
         return true;
     }
 
@@ -57,7 +66,7 @@ public sealed class LoginSessionManager(
             return true;
 
         if (!transferManager.IsTransfering(account))
-            _ = accountManager.UpdateAccountStateAsync(account.Id, isOnline: false, CancellationToken.None);
+            presence.ReleaseIfOwnedBy(account.Id, PresenceOwner.Login);
 
         return true;
     }

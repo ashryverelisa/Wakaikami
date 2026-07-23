@@ -5,6 +5,7 @@ using Wakaikami.Core.Time;
 using Wakaikami.Core.Updates;
 using Wakaikami.LoginService.Content.Account;
 using Wakaikami.LoginService.Content.Account.Interfaces;
+using Wakaikami.LoginService.GameNetwork.Listening;
 using Wakaikami.LoginService.GameNetwork.Protocol.User;
 using Wakaikami.LoginService.GameNetwork.Protocol.User.Server;
 
@@ -17,9 +18,9 @@ public sealed class AccountTransferManager(UpdateManager updateManager, IAccount
     private readonly ConcurrentDictionary<Guid, AccountTransfer> _transfersByGuid = new();
     private readonly ConcurrentDictionary<int, AccountTransfer> _transfersById = new();
 
-    public bool GenerateTransfer(GameAccount account, out AccountTransfer tf)
+    public bool GenerateTransfer(GameAccount account, LoginSession? session, out AccountTransfer tf)
     {
-        tf = new AccountTransfer(account);
+        tf = new AccountTransfer(account) { Session = session };
 
         if (!_transfersById.TryAdd(account.Id, tf))
             return false;

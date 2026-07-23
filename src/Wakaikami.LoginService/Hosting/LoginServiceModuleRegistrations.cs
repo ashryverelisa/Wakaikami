@@ -31,7 +31,7 @@ public class LoginServiceModuleRegistrations : IServiceRegistrar
 
         services.AddSingletonAs<LoginSessionManager, ILoginSessionManager, IGameServerModule>(sp => new LoginSessionManager(
             sp.GetRequiredService<IOptions<LoginOptions>>().Value.Info.MaxConnection,
-            sp.GetRequiredService<IAccountManager>(),
+            sp.GetRequiredService<IAccountPresence>(),
             sp.GetRequiredService<AccountTransferManager>(),
             sp.GetRequiredService<ILogger<LoginSessionManager>>()
         ));

@@ -10,13 +10,8 @@ using Wakaikami.Networking.Grpc.Messages.WorldPush;
 
 namespace Wakaikami.LoginService.Grpc;
 
-public sealed partial class WorldPushService(
-    IWorldPushHub hub,
-    IWorldServerManager worldServers,
-    IAccountPresence presence,
-    IAccountManager accounts,
-    ILogger<WorldPushService> logger
-) : WorldPushStream.WorldPushStreamBase
+public sealed partial class WorldPushService(IWorldPushHub hub, IWorldServerManager worldServers, IAccountPresence presence, ILogger<WorldPushService> logger)
+    : WorldPushStream.WorldPushStreamBase
 {
     public override Task Subscribe(WorldSubscribeRequest request, IServerStreamWriter<WorldPush> responseStream, ServerCallContext context) =>
         PushStreamServer.PumpAsync(
@@ -40,13 +35,6 @@ public sealed partial class WorldPushService(
             return;
 
         LogWorldPresenceReleased(worldId, released.Count);
-        _ = SyncOfflineAsync(released);
-    }
-
-    private async Task SyncOfflineAsync(IReadOnlyList<int> accountIds)
-    {
-        foreach (var accountId in accountIds)
-            await accounts.UpdateAccountStateAsync(accountId, false, CancellationToken.None);
     }
 
     [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "World {WorldId} disconnected; released {Count} account(s) it still held")]

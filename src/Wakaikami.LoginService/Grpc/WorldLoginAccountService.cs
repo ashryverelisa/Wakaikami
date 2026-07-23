@@ -16,30 +16,26 @@ public sealed partial class WorldLoginAccountService(
     ILogger<WorldLoginAccountService> logger
 ) : WorldLoginAccount.WorldLoginAccountBase
 {
-    public override async Task<Empty> AccountOffline(AccountOfflineRequest request, ServerCallContext context)
+    public override Task<Empty> AccountOffline(AccountOfflineRequest request, ServerCallContext context)
     {
         // Only the world that still holds the account may release it: a notice that overtakes a handover
         // (world -> world, or world -> login) would otherwise clear a claim that is no longer its own.
         if (TryWorld(request.WorldId, out var owner))
             presence.ReleaseIfOwnedBy(request.AccountId, owner);
 
-        await accounts.UpdateAccountStateAsync(request.AccountId, false, context.CancellationToken);
-        return new Empty();
+        return Task.FromResult(new Empty());
     }
 
     /// <summary>Bulk resync a world pushes when it (re)connects: these accounts are in-game right now.</summary>
-    public override async Task<Empty> AccountOnlineList(AccountOnlineListRequest request, ServerCallContext context)
+    public override Task<Empty> AccountOnlineList(AccountOnlineListRequest request, ServerCallContext context)
     {
-        var known = TryWorld(request.WorldId, out var owner);
-
-        foreach (var accountId in request.AccountIds)
+        if (TryWorld(request.WorldId, out var owner))
         {
-            if (known)
+            foreach (var accountId in request.AccountIds)
                 presence.MarkOnline(accountId, owner);
-
-            await accounts.UpdateAccountStateAsync(accountId, isOnline: true, context.CancellationToken);
         }
-        return new Empty();
+
+        return Task.FromResult(new Empty());
     }
 
     private bool TryWorld(int worldId, out PresenceOwner owner)
@@ -53,7 +49,7 @@ public sealed partial class WorldLoginAccountService(
 
     public override Task<TransferGenReply> TransferGen(TransferGenRequest request, ServerCallContext context)
     {
-        var reply = transfers.GenerateTransfer(new GameAccount { Id = request.AccountId, Name = request.AccountName }, out var transfer)
+        var reply = transfers.GenerateTransfer(new GameAccount { Id = request.AccountId, Name = request.AccountName }, session: null, out var transfer)
             ? new TransferGenReply { AuthId = transfer.AuthId.ToString(), Success = true }
             : new TransferGenReply { Success = false };
         return Task.FromResult(reply);
