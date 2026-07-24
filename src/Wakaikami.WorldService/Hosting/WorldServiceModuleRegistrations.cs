@@ -13,6 +13,7 @@ using Wakaikami.Networking.Grpc.Messages.WorldLoginAccount;
 using Wakaikami.Networking.Grpc.Messages.WorldLoginRegistration;
 using Wakaikami.Networking.Grpc.Messages.WorldPush;
 using Wakaikami.WorldService.Configuration;
+using Wakaikami.WorldService.Content.Zone;
 using Wakaikami.WorldService.Core;
 using Wakaikami.WorldService.GameNetwork.Listening;
 using Wakaikami.WorldService.GameNetwork.Listening.Interfaces;
@@ -54,5 +55,7 @@ public sealed class WorldServiceModuleRegistrations : IServiceRegistrar
         }
 
         services.AddSingletonAs<WorldServer, IShutdownHandler>();
+
+        services.AddSingletonAs<ZoneManager, IGameServerModule>();
     }
 }

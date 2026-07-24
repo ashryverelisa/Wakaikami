@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package wakaikami.grpc.zone_world_account;
+
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "Wakaikami.Networking.Grpc.Messages.ZoneWorldAccount";
+
+service ZoneWorldAccount {
+  rpc GetAccountSession(AccountSessionRequest) returns (AccountSessionReply);
+  rpc SessionCut(SessionCutRequest) returns (google.protobuf.Empty);
+}
+
+message AccountSessionRequest {
+  int32 session_id = 1;
+}
+
+message AccountSessionReply {
+  bool found = 1;
+  int32 account_id = 2;
+  string account_name = 3;
+}
+
+message SessionCutRequest {
+  int32 session_id = 1;
+}

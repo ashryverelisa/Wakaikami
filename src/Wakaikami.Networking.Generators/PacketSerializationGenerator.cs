@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -162,7 +161,10 @@ public sealed class PacketSerializationGenerator : IIncrementalGenerator
             var kind = length > 0 ? FieldKind.String : FieldKind.VariableString;
             return new FieldInfo(order, name, "string", kind, length, null);
         }
-        if (string.Equals(type.Name, "Guid", System.StringComparison.Ordinal) && string.Equals(type.ContainingNamespace?.ToDisplayString(), "System", System.StringComparison.Ordinal))
+        if (
+            string.Equals(type.Name, "Guid", System.StringComparison.Ordinal)
+            && string.Equals(type.ContainingNamespace?.ToDisplayString(), "System", System.StringComparison.Ordinal)
+        )
             return new FieldInfo(order, name, "global::System.Guid", FieldKind.Guid, 0, null);
         if (type is IArrayTypeSymbol { ElementType.SpecialType: SpecialType.System_Byte })
             return new FieldInfo(order, name, "byte[]", FieldKind.Bytes, length, null);

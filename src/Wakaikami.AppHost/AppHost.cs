@@ -28,13 +28,16 @@ var world = builder
     .WaitForCompletion(migrator)
     .WaitFor(login);
 
-var zone = builder.AddProject<Wakaikami_ZoneService>("zone-service").WithEnvironment("Grpc__WorldEndpoint", world.GetEndpoint("grpc-intern")).WaitFor(world);
+var zone = builder
+    .AddProject<Wakaikami_ZoneService>("zone-service")
+    .WithReference(worldDb) // -> ConnectionStrings:World
+    .WithEnvironment("Grpc__WorldEndpoint", world.GetEndpoint("grpc-intern"))
+    .WaitForCompletion(migrator)
+    .WaitFor(world);
 
 builder
     .AddProject<Wakaikami_Web>("web")
     .WithReference(loginDb) // -> ConnectionStrings:Login
-    .WithReference(worldDb) // -> ConnectionStrings:World
-    .WithExternalHttpEndpoints()
     .WaitForCompletion(migrator);
 
 builder.Build().Run();

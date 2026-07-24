@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Wakaikami.Core.Database;
 using Wakaikami.Core.Database.Enums;
 using Wakaikami.Core.Database.Interfaces;
-using Wakaikami.Core.Hosting.Enums;
 using Wakaikami.Database.Login.Repositories.Interfaces;
 using Wakaikami.Database.Login.Repositories.Models;
 

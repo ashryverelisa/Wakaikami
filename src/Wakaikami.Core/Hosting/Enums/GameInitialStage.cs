@@ -3,6 +3,7 @@
 public enum GameInitialStage
 {
     Logic,
+    Zone,
     Account,
     Network,
 }
