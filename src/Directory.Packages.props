@@ -80,4 +80,7 @@
   <ItemGroup Label="Security">
     <PackageVersion Include="BCrypt.Net-Next" Version="4.2.0" />
   </ItemGroup>
+  <ItemGroup Label="UI / Blazor">
+    <PackageVersion Include="MudBlazor" Version="9.7.0" />
+  </ItemGroup>
 </Project>

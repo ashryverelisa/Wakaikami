@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Wakaikami.Database.Common.CustomMigrations.Interfaces;
+using Wakaikami.Database.Login;
 
 namespace Wakaikami.Database.Migrations.Login.CustomMigrations;
 

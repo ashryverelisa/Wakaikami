@@ -14,5 +14,6 @@ public sealed class NcUserWorldSelectAck(Guid authId, WorldServer server, GameSe
         Writer.WriteString(server.Info.Ip, 16);
         Writer.Write(server.Info.Port);
         Writer.WriteGuid(authId); //32 Bytes after that also just a transfer token
+        Writer.Fill(0x00, 32);
     }
 }

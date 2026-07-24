@@ -2,8 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Wakaikami.Content.Account;
-using Wakaikami.Core.Hosting.Enums;
-using Wakaikami.Core.Hosting.Interfaces;
 using Wakaikami.LoginService.Content.Account;
 using Wakaikami.LoginService.Content.Account.Interfaces;
 using Wakaikami.LoginService.Content.Transfer;
@@ -16,13 +14,8 @@ public sealed class LoginSessionManager(
     IAccountPresence presence,
     AccountTransferManager transferManager,
     ILogger<LoginSessionManager> logger
-) : IdPooledSessionManager<LoginSession>(maxConnections, logger), ILoginSessionManager, IGameServerModule
+) : IdPooledSessionManager<LoginSession>(maxConnections, logger), ILoginSessionManager
 {
-    InitialType IModule<GameInitialStage>.InitialType => InitialType.Login;
-    GameInitialStage IModule<GameInitialStage>.Stage => GameInitialStage.Network;
-
-    Task<bool> IGameServerModule.InitializeAsync(CancellationToken cancellationToken) => Task.FromResult(true);
-
     private readonly ConcurrentDictionary<string, LoginSession> _sessionsByName = new(StringComparer.Ordinal);
 
     private const int ConnectionSyncTime = 30;

@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Wakaikami.Database.Common.CustomMigrations;
 using Wakaikami.Database.Login.Entities;
 using Wakaikami.Database.Login.Entities.Enums;
 
-namespace Wakaikami.Database.Migrations.Login;
+namespace Wakaikami.Database.Login;
 
 public class LoginDbContext(DbContextOptions<LoginDbContext> options) : MigratableDbContext(options)
 {
