@@ -6,8 +6,13 @@ namespace Wakaikami.Networking.Grpc.Helpers;
 
 public static class GrpcCertHelper
 {
-    private const string CertPassword = "dev-only";
+    private const string DefaultCertPassword = "dev-only";
     private const string CertSubDir = "certs";
+
+    // Deployment override (e.g. Kubernetes Secret mount): WAKAIKAMI_CERT_DIR points at the mounted
+    // certs directory, WAKAIKAMI_CERT_PASSWORD at the PFX password. Falls back to the dev defaults.
+    private static string CertPassword =>
+        Environment.GetEnvironmentVariable("WAKAIKAMI_CERT_PASSWORD") ?? DefaultCertPassword;
 
     private static X509Certificate2? _cachedCa;
 
@@ -88,6 +93,18 @@ public static class GrpcCertHelper
 
     private static string ResolveCertPath(string fileName)
     {
+        var overrideDir = Environment.GetEnvironmentVariable("WAKAIKAMI_CERT_DIR");
+        if (!string.IsNullOrWhiteSpace(overrideDir))
+        {
+            var overridePath = Path.Combine(overrideDir, fileName);
+            return File.Exists(overridePath)
+                ? overridePath
+                : throw new FileNotFoundException(
+                    $"WAKAIKAMI_CERT_DIR is set but {overridePath} does not exist.",
+                    fileName
+                );
+        }
+
         var assemblyDir = AppContext.BaseDirectory;
         for (var dir = assemblyDir; dir != null; dir = Path.GetDirectoryName(dir))
         {

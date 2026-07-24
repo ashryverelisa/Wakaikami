@@ -1,0 +1,30 @@
+# Applies EF Core + custom migrations for both databases, then exits.
+# Retries (restartPolicy: OnFailure) cover the window where SQL Server is still starting.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrator
+  namespace: wakaikami
+spec:
+  backoffLimit: 10
+  template:
+    metadata:
+      labels:
+        app: migrator
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrator
+          image: wakaikami/migrator:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ConnectionStrings__Login
+              valueFrom:
+                secretKeyRef:
+                  name: wakaikami-config
+                  key: connectionstring-login
+            - name: ConnectionStrings__World
+              valueFrom:
+                secretKeyRef:
+                  name: wakaikami-config
+                  key: connectionstring-world

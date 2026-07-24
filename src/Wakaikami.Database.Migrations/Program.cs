@@ -54,5 +54,5 @@ static async Task ApplyAsync<TContext>(
     await db.Database.MigrateAsync(cancellationToken);
 
     // 2. Custom data/stored-procedure migrations (customMigrationHistory-tracked).
-    await new CustomMigrationRunner<TContext>().Migrate(db, logger, cancellationToken);
+    await new CustomMigrationRunner<TContext>(typeof(MigratorConfiguration).Assembly).Migrate(db, logger, cancellationToken);
 }

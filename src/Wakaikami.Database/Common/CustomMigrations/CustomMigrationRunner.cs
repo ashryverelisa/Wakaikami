@@ -1,16 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Wakaikami.Database.Common.CustomMigrations.Extensions;
 using Wakaikami.Database.Common.CustomMigrations.Interfaces;
 
 namespace Wakaikami.Database.Common.CustomMigrations;
 
-public class CustomMigrationRunner<TDbContext>
+/// <param name="migrationsAssembly">
+/// Assembly scanned for <see cref="ICustomMigration{TContext}"/> implementations. The migration
+/// classes live in Wakaikami.Database.Migrations, not in the DbContext's own assembly, so callers
+/// must pass the migrations assembly; the DbContext assembly is only a fallback.
+/// </param>
+public class CustomMigrationRunner<TDbContext>(Assembly? migrationsAssembly = null)
     where TDbContext : DbContext, ICustomMigrationDbContext
 {
-    private static IEnumerable<ICustomMigration<TDbContext>> Migrations =>
-        typeof(TDbContext)
-            .Assembly.GetTypes()
+    private IEnumerable<ICustomMigration<TDbContext>> Migrations =>
+        (migrationsAssembly ?? typeof(TDbContext).Assembly)
+            .GetTypes()
             .Where(x => x is { IsClass: true, IsAbstract: false } && typeof(ICustomMigration<TDbContext>).IsAssignableFrom(x))
             .Select(x => (ICustomMigration<TDbContext>?)Activator.CreateInstance(x))
             .WhereNotNull()

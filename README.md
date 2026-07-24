@@ -67,6 +67,42 @@ On first run, Aspire prompts for the `sql-password` secret parameter.
 
 Services can also be run standalone (`dotnet run --project Wakaikami.LoginService`, etc.); in that case configure the connection strings and endpoints in each service's `appsettings.json` yourself.
 
+## Running on Kubernetes (local)
+
+The cluster can also run on Kubernetes. Manifests live in `k8s/`; container images are built with
+the .NET SDK container publish (no Dockerfiles needed).
+
+Prerequisites: Docker, [kind](https://kind.sigs.k8s.io/) (e.g. `winget install Kubernetes.kind` / `brew install kind`), `kubectl`.
+All scripts are cross-platform C# file-based apps run via the .NET SDK no shell dependency.
+
+```bash
+# builds the images, creates the kind cluster, loads images, applies all manifests
+dotnet run scripts/deploy-kind.cs
+```
+
+The script:
+
+1. Builds `wakaikami/{login-service,world-service,zone-service,web,migrator}:latest` via `dotnet publish /t:PublishContainer` (`scripts/build-images.cs`)
+2. Creates a kind cluster from `k8s/kind/config.yaml` the game/web NodePorts are mapped to the same host ports as under Aspire (`9010`, `9120`, `9230`, web on `8080`)
+3. Creates the `wakaikami-certs` secret from `src/certs` (mounted into the pods; `WAKAIKAMI_CERT_DIR` points the services at it)
+4. Applies the manifests: SQL Server StatefulSet, migrator Job, and one Deployment + Service per service
+
+Startup ordering is handled by retries (the migrator Job retries until SQL Server is up; World/Zone
+reconnect until their upstream gRPC endpoint is reachable), so everything can be applied at once.
+
+Useful commands:
+
+```bash
+kubectl -n wakaikami get pods                       # status
+kubectl -n wakaikami logs deployment/world -f        # logs
+kind delete cluster --name wakaikami                 # tear down
+```
+
+The dev certs (`scripts/generate-dev-certs.cs`, run with `dotnet run scripts/generate-dev-certs.cs`)
+include SANs for both `localhost` and the Kubernetes service DNS names (`login-service`,
+`world-service`, …), so the same certs work under Aspire and in the cluster. Secrets in
+`k8s/01-secrets.yaml` are dev-only values override them for anything beyond a local cluster.
+
 ### Default ports
 
 | Endpoint | Port |

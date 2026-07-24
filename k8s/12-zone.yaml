@@ -1,0 +1,65 @@
+# Game client entry point (TCP). NodePort 30230 is mapped to host port 9230 in k8s/kind/config.yaml.
+# The zone's game listener only starts after it has registered with the world service, so the
+# readiness probe doubles as a "fully booted" signal.
+apiVersion: v1
+kind: Service
+metadata:
+  name: zone-game
+  namespace: wakaikami
+spec:
+  type: NodePort
+  selector:
+    app: zone
+  ports:
+    - name: game
+      port: 9230
+      targetPort: 9230
+      nodePort: 30230
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zone
+  namespace: wakaikami
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zone
+  template:
+    metadata:
+      labels:
+        app: zone
+    spec:
+      containers:
+        - name: zone
+          image: wakaikami/zone-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: game
+              containerPort: 9230
+          env:
+            - name: ConnectionStrings__World
+              valueFrom:
+                secretKeyRef:
+                  name: wakaikami-config
+                  key: connectionstring-world
+            - name: Grpc__WorldEndpoint
+              value: https://world-service:8510
+            - name: Zone__ZoneServerInfo__ConnectIP
+              value: "127.0.0.1"
+            - name: WAKAIKAMI_CERT_DIR
+              value: /certs
+          volumeMounts:
+            - name: certs
+              mountPath: /certs
+              readOnly: true
+          readinessProbe:
+            tcpSocket:
+              port: 9230
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      volumes:
+        - name: certs
+          secret:
+            secretName: wakaikami-certs

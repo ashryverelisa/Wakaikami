@@ -1,0 +1,81 @@
+# Cluster-internal gRPC endpoint. The name "login-service" must stay in sync with the
+# server cert SANs (scripts/generate-dev-certs.cs) and Grpc__LoginEndpoint on the world service.
+apiVersion: v1
+kind: Service
+metadata:
+  name: login-service
+  namespace: wakaikami
+spec:
+  selector:
+    app: login
+  ports:
+    - name: grpc
+      port: 8500
+      targetPort: 8500
+---
+# Game client entry point (TCP). NodePort 30010 is mapped to host port 9010 in k8s/kind/config.yaml.
+apiVersion: v1
+kind: Service
+metadata:
+  name: login-game
+  namespace: wakaikami
+spec:
+  type: NodePort
+  selector:
+    app: login
+  ports:
+    - name: game
+      port: 9010
+      targetPort: 9010
+      nodePort: 30010
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login
+  namespace: wakaikami
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: login
+  template:
+    metadata:
+      labels:
+        app: login
+    spec:
+      containers:
+        - name: login
+          image: wakaikami/login-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 8500
+            - name: game
+              containerPort: 9010
+          env:
+            - name: Login__ConnectionString__Login
+              valueFrom:
+                secretKeyRef:
+                  name: wakaikami-config
+                  key: connectionstring-login
+            - name: PasswordHashing__Pepper
+              valueFrom:
+                secretKeyRef:
+                  name: wakaikami-config
+                  key: pepper
+            - name: WAKAIKAMI_CERT_DIR
+              value: /certs
+          volumeMounts:
+            - name: certs
+              mountPath: /certs
+              readOnly: true
+          readinessProbe:
+            tcpSocket:
+              port: 8500
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: certs
+          secret:
+            secretName: wakaikami-certs
