@@ -9,4 +9,13 @@ internal static partial class LoggerMessages
 
     [LoggerMessage(EventId = 2, Level = LogLevel.Error, Message = "WorldServer Port {Port} already in use")]
     public static partial void WorldServerPortInUse(this ILogger logger, int port);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "gRPC RegisterZone rejected: invalid zone id {ZoneId}")]
+    public static partial void ZoneRegisterRejected(this ILogger logger, int zoneId);
+
+    [LoggerMessage(EventId = 4, Level = LogLevel.Information, Message = "Zone {ZoneId} registered over gRPC")]
+    public static partial void ZoneRegistered(this ILogger logger, int zoneId);
+
+    [LoggerMessage(EventId = 5, Level = LogLevel.Error, Message = "Invalid AwaitingZone Count need more as Zero")]
+    public static partial void InvalidAwaitingZoneCount(this ILogger logger);
 }

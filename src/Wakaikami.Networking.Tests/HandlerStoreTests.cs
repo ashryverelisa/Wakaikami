@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Testing.Platform.Logging;
 using NSubstitute;
 using Wakaikami.Networking.HandlerStores;
 using Wakaikami.Networking.HandlerStores.Interfaces;

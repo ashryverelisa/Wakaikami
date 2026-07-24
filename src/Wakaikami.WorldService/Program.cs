@@ -36,7 +36,10 @@ builder.AddServiceModules(
 
 builder.Services.AddLogging();
 builder.Services.AddGrpc();
+builder.Services.AddSingleton<ZoneWorldAccountService>();
 builder.Services.AddSingleton<IZonePushHub, ZonePushHub>();
+builder.Services.AddSingleton<ZonePushService>();
+builder.Services.AddSingleton<ZoneRegistrationService>();
 
 builder.Services.AddServerLifecycleHostedServices(
     databaseStage: services =>
@@ -51,5 +54,8 @@ builder.WebHost.ConfigureGrpcKestrel(grpcPort, GrpcCertHelper.LoadWorldServerCer
 var app = builder.Build();
 
 app.MapGrpcService<InternalControlService>();
+app.MapGrpcService<ZoneWorldAccountService>();
+app.MapGrpcService<ZonePushService>();
+app.MapGrpcService<ZoneRegistrationService>();
 
 await app.RunAsync();
