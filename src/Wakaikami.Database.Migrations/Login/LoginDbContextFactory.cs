@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Wakaikami.Database.Login;
 
 namespace Wakaikami.Database.Migrations.Login;
 
@@ -13,7 +14,9 @@ public class LoginDbContextFactory : IDesignTimeDbContextFactory<LoginDbContext>
         var configuration = MigratorConfiguration.Build();
         var connectionString = MigratorConfiguration.ResolveConnectionString(configuration, "Login", requirePassword: false);
 
-        var options = new DbContextOptionsBuilder<LoginDbContext>().UseSqlServer(connectionString).Options;
+        var options = new DbContextOptionsBuilder<LoginDbContext>()
+            .UseSqlServer(connectionString, sql => sql.MigrationsAssembly("Wakaikami.Database.Migrations"))
+            .Options;
 
         return new LoginDbContext(options);
     }

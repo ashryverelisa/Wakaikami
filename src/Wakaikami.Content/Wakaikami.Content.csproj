@@ -6,5 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Wakaikami.Core\Wakaikami.Core.csproj" />
+    <ProjectReference Include="..\Wakaikami.Networking\Wakaikami.Networking.csproj" />
   </ItemGroup>
 </Project>

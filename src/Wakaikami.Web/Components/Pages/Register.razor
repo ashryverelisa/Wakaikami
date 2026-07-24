@@ -1,0 +1,178 @@
+@page "/register"
+@rendermode InteractiveServer
+@using System.Text.RegularExpressions
+@using Wakaikami.Database.Login.Repositories.Models
+@using Wakaikami.Web.Services.Interfaces
+@inject IAccountRegistrationService RegistrationService
+
+
+<PageTitle>Register</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-8">
+    <MudPaper Class="pa-8" Elevation="4">
+        <MudText Typo="Typo.h4" GutterBottom="true">Create account</MudText>
+        <MudText Typo="Typo.body2" Class="mud-text-secondary mb-4">
+            The account works for both the game and the web the chosen credentials work in both.
+        </MudText>
+
+        @if (_succeeded)
+        {
+            <MudAlert Severity="Severity.Success" Variant="Variant.Filled">
+                Account <b>@_registeredUsername</b> was created. You can now log in.
+            </MudAlert>
+        }
+        else
+        {
+            @if (_errorMessage is not null)
+            {
+                <MudAlert Severity="Severity.Error" Class="mb-4" ShowCloseIcon="true" CloseIconClicked="() => _errorMessage = null">
+                    @_errorMessage
+                </MudAlert>
+            }
+
+            <MudForm @ref="_form" Model="_model">
+                <MudTextField T="string"
+                              @bind-Value="_model.Username"
+                              Label="Username"
+                              Variant="Variant.Outlined"
+                              Immediate="false"
+                              Validation="@(new Func<string, Task<string?>>(ValidateUsernameAsync))"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Person"
+                              Counter="MaxUsernameLength"
+                              MaxLength="MaxUsernameLength"/>
+
+                <MudTextField T="string"
+                              @bind-Value="_model.Password"
+                              Label="Password"
+                              Variant="Variant.Outlined"
+                              InputType="InputType.Password"
+                              Class="mt-4"
+                              Immediate="false"
+                              Validation="@(new Func<string, string?>(ValidatePassword))"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Lock"/>
+
+                <MudTextField T="string"
+                              @bind-Value="_model.ConfirmPassword"
+                              Label="Confirm password"
+                              Variant="Variant.Outlined"
+                              InputType="InputType.Password"
+                              Class="mt-4"
+                              Immediate="false"
+                              Validation="@(new Func<string, string?>(ValidateConfirmPassword))"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.LockClock"/>
+
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           FullWidth="true"
+                           Class="mt-6"
+                           Disabled="_submitting"
+                           OnClick="@SubmitAsync">
+                    @if (_submitting)
+                    {
+                        <MudProgressCircular Class="mr-2" Size="Size.Small" Indeterminate="true"/>
+                        <span>Creating…</span>
+                    }
+                    else
+                    {
+                        <span>Register</span>
+                    }
+                </MudButton>
+            </MudForm>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+
+    // TODO: make this cleaner
+    // currently its only for local testing
+    private const int MinUsernameLength = 4;
+    private const int MaxUsernameLength = 16;
+    private const int MinPasswordLength = 3;
+
+    private static readonly Regex UsernamePattern = new("^[A-Za-z0-9_]+$", RegexOptions.Compiled);
+
+    private readonly RegisterModel _model = new();
+    private MudForm _form = null!;
+
+    private bool _submitting;
+    private bool _succeeded;
+    private string? _errorMessage;
+    private string? _registeredUsername;
+
+    private async Task SubmitAsync()
+    {
+        await _form.ValidateAsync();
+        if (!_form.IsValid)
+            return;
+
+        _submitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            var result = await RegistrationService.RegisterAsync(_model.Username, _model.Password);
+
+            if (result == AccountRegistrationResult.UsernameTaken)
+            {
+                _errorMessage = "This username is already taken.";
+                return;
+            }
+
+            _registeredUsername = _model.Username;
+            _succeeded = true;
+        }
+        catch (Exception)
+        {
+            _errorMessage = "Registration failed. Please try again later.";
+        }
+        finally
+        {
+            _submitting = false;
+        }
+    }
+
+    private async Task<string?> ValidateUsernameAsync(string username)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+            return "Username is required.";
+
+        if (username.Length is < MinUsernameLength or > MaxUsernameLength)
+            return $"Username must be {MinUsernameLength}–{MaxUsernameLength} characters long.";
+
+        if (!UsernamePattern.IsMatch(username))
+            return "Only letters, digits and underscores are allowed.";
+
+        if (!await RegistrationService.IsUsernameAvailableAsync(username))
+            return "This username is already taken.";
+
+        return null;
+    }
+
+    private static string? ValidatePassword(string password)
+    {
+        if (string.IsNullOrEmpty(password))
+            return "Password is required.";
+
+        return password.Length < MinPasswordLength ? $"Password must be at least {MinPasswordLength} characters long." : null;
+    }
+
+    private string? ValidateConfirmPassword(string confirm)
+    {
+        if (string.IsNullOrEmpty(confirm))
+            return "Please confirm the password.";
+
+        return confirm != _model.Password ? "The passwords do not match." : null;
+    }
+
+    private sealed class RegisterModel
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
+}

@@ -9,4 +9,5 @@ public sealed class LoginOptions
 
     [Required, ValidateObjectMembers]
     public LoginServerInfoOptions Info { get; set; } = new();
+    public string ClientVersion { get; set; } = string.Empty;
 }

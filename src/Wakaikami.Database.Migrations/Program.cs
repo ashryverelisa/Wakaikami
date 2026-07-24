@@ -2,8 +2,9 @@
 using Microsoft.Extensions.Logging;
 using Wakaikami.Database.Common.CustomMigrations;
 using Wakaikami.Database.Common.CustomMigrations.Interfaces;
+using Wakaikami.Database.Login;
 using Wakaikami.Database.Migrations;
-using Wakaikami.Database.Migrations.Login;
+using Wakaikami.Database.World;
 
 var configuration = MigratorConfiguration.Build();
 
@@ -18,10 +19,12 @@ Console.CancelKeyPress += (_, e) =>
 };
 
 var authConnection = MigratorConfiguration.ResolveConnectionString(configuration, "Login");
+var worldConnection = MigratorConfiguration.ResolveConnectionString(configuration, "World");
 
 try
 {
     await ApplyAsync<LoginDbContext>(authConnection, options => new LoginDbContext(options), logger, cts.Token);
+    await ApplyAsync<WorldDbContext>(worldConnection, options => new WorldDbContext(options), logger, cts.Token);
 
     logger.MigrationsApplied();
     return 0;
@@ -42,7 +45,9 @@ static async Task ApplyAsync<TContext>(
 {
     logger.ApplyingMigrations(typeof(TContext).Name);
 
-    var options = new DbContextOptionsBuilder<TContext>().UseSqlServer(connectionString).Options;
+    var options = new DbContextOptionsBuilder<TContext>()
+        .UseSqlServer(connectionString, sql => sql.MigrationsAssembly("Wakaikami.Database.Migrations"))
+        .Options;
     await using var db = factory(options);
 
     // 1. EF Core schema migrations (the __EFMigrationsHistory-tracked ones).

@@ -2,6 +2,7 @@
 
 public enum ShutdownOrder
 {
+    Network,
     Database,
     Updates,
 }
