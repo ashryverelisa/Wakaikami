@@ -4,6 +4,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+    <ContainerRepository>wakaikami/web</ContainerRepository>
   </PropertyGroup>
 
   <ItemGroup>

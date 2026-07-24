@@ -1,0 +1,16 @@
+# Local kind cluster with host port mappings for the game/web NodePorts, so game clients and the
+# browser can connect to 127.0.0.1 with the same ports as under Aspire.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: wakaikami
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30010 # login-game NodePort
+        hostPort: 9010
+      - containerPort: 30120 # world-game NodePort
+        hostPort: 9120
+      - containerPort: 30230 # zone-game NodePort
+        hostPort: 9230
+      - containerPort: 30080 # web NodePort
+        hostPort: 8080

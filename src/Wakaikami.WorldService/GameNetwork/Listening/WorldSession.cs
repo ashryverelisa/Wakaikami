@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Logging;
 using Wakaikami.Content.Account;
 using Wakaikami.Content.Protocol.Misc.Server;
-using Wakaikami.LoginService.GameNetwork.Protocol.User.Server;
 using Wakaikami.Networking.HandlerStores;
 using Wakaikami.WorldService.GameNetwork.Protocol.Misc.Server;
+using Wakaikami.WorldService.GameNetwork.Protocol.User.Server;
 
 namespace Wakaikami.WorldService.GameNetwork.Listening;
 
