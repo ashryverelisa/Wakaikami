@@ -1,6 +1,8 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Wakaikami.Core.Diagnostics;
 using Wakaikami.Core.Hosting.Enums;
 using Wakaikami.Core.Hosting.Interfaces;
 using Wakaikami.Core.Time;
@@ -41,6 +43,7 @@ public sealed partial class UpdateManager(
                 throw new InvalidOperationException("UpdateManager already started.");
             }
 
+            CoreMetrics.RegisterUpdatableSource(this, () => _updates.Count);
             _cts = new CancellationTokenSource();
             var token = _cts.Token;
             _loop = Task.Run(() => RunLoopAsync(token), CancellationToken.None);
@@ -118,6 +121,7 @@ public sealed partial class UpdateManager(
         }
         _isDisposed = true;
 
+        CoreMetrics.UnregisterUpdatableSource(this);
         Stop();
 
         foreach (var entry in _updates.Keys)
@@ -149,8 +153,10 @@ public sealed partial class UpdateManager(
                     _serverTime.Tick();
                     var now = _serverTime.GetUtcNow().UtcDateTime;
 
+                    var start = Stopwatch.GetTimestamp();
                     TickUpdates(now);
                     TickExpire(now);
+                    CoreMetrics.RecordTick(Stopwatch.GetElapsedTime(start), DefaultTickInterval);
                 }
                 catch (Exception ex)
                 {
@@ -177,6 +183,7 @@ public sealed partial class UpdateManager(
             }
             catch (Exception ex)
             {
+                CoreMetrics.TickItemFaulted();
                 LogTickFailed(ex, entry.GetType().Name);
             }
         }

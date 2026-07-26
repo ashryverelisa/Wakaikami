@@ -72,6 +72,8 @@ Run(
         "deployment/world",
         "deployment/zone",
         "deployment/web",
+        "deployment/prometheus",
+        "deployment/grafana",
         "--timeout=300s",
     ]
 );
@@ -80,6 +82,8 @@ Console.WriteLine("==> Done");
 Run("kubectl", ["-n", "wakaikami", "get", "pods"]);
 Console.WriteLine();
 Console.WriteLine("Web UI:      http://localhost:8080");
+Console.WriteLine("Grafana:     http://localhost:3000 (host port needs a cluster created with the current kind config)");
+Console.WriteLine("Prometheus:  kubectl -n wakaikami port-forward svc/prometheus 9090");
 Console.WriteLine("Login game:  127.0.0.1:9010 | World game: 127.0.0.1:9120 | Zone game: 127.0.0.1:9230");
 return;
 

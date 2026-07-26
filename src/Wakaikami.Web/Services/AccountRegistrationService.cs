@@ -6,6 +6,7 @@ using Wakaikami.Database.Login.Entities;
 using Wakaikami.Database.Login.Entities.Enums;
 using Wakaikami.Database.Login.Repositories.Interfaces;
 using Wakaikami.Database.Login.Repositories.Models;
+using Wakaikami.Web.Diagnostics;
 using Wakaikami.Web.Services.Interfaces;
 
 namespace Wakaikami.Web.Services;
@@ -21,7 +22,7 @@ public sealed class AccountRegistrationService(
         return !await repository.UsernameExistsAsync(username, cancellationToken);
     }
 
-    public Task<AccountRegistrationResult> RegisterAsync(string username, string password, CancellationToken cancellationToken = default)
+    public async Task<AccountRegistrationResult> RegisterAsync(string username, string password, CancellationToken cancellationToken = default)
     {
         var clientMd5 = ComputeClientMd5(password);
 
@@ -35,7 +36,9 @@ public sealed class AccountRegistrationService(
             AccountType = AccountTypes.Player,
         };
 
-        return repository.AddAccountAsync(account, cancellationToken);
+        var result = await repository.AddAccountAsync(account, cancellationToken);
+        WebMetrics.RegistrationCompleted(result);
+        return result;
     }
 
     [SuppressMessage(

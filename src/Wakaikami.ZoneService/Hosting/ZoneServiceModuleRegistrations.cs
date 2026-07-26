@@ -14,6 +14,7 @@ using Wakaikami.Networking.Grpc.Messages.ZonePush;
 using Wakaikami.Networking.Grpc.Messages.ZoneRegistration;
 using Wakaikami.Networking.Grpc.Messages.ZoneWorldAccount;
 using Wakaikami.ZoneService.Configuration;
+using Wakaikami.ZoneService.Diagnostics;
 using Wakaikami.ZoneService.GameNetwork.Listening;
 using Wakaikami.ZoneService.GameNetwork.Listening.Interfaces;
 using Wakaikami.ZoneService.Grpc;
@@ -29,11 +30,16 @@ public sealed class ZoneServiceModuleRegistrations : IServiceRegistrar
 
         services.AddDatabase(configuration, DatabaseType.World, "ConnectionStrings:World");
 
-        services.AddSingletonAs<ZoneSessionManager, IZoneSessionManager>(sp => new ZoneSessionManager(
-            sp.GetRequiredService<IOptions<ZoneOptions>>().Value.ZoneServerInfo.MaxConnection,
-            sp.GetRequiredService<ISh03ClusterHandler>(),
-            sp.GetRequiredService<ILogger<ZoneSessionManager>>()
-        ));
+        services.AddSingletonAs<ZoneSessionManager, IZoneSessionManager>(sp =>
+        {
+            var manager = new ZoneSessionManager(
+                sp.GetRequiredService<IOptions<ZoneOptions>>().Value.ZoneServerInfo.MaxConnection,
+                sp.GetRequiredService<ISh03ClusterHandler>(),
+                sp.GetRequiredService<ILogger<ZoneSessionManager>>()
+            );
+            ZoneMetrics.RegisterOnlineCharactersGauge(() => manager.OnlineCharacterCount);
+            return manager;
+        });
         services.AddHostedService(sp => sp.GetRequiredService<ZoneSessionManager>());
 
         // Internal Zone↔World hop runs over gRPC.

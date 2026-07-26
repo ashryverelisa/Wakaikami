@@ -12,6 +12,9 @@ spec:
     - name: grpc
       port: 8500
       targetPort: 8500
+    - name: metrics
+      port: 9464
+      targetPort: 9464
 ---
 # Game client entry point (TCP). NodePort 30010 is mapped to host port 9010 in k8s/kind/config.yaml.
 apiVersion: v1
@@ -53,6 +56,8 @@ spec:
               containerPort: 8500
             - name: game
               containerPort: 9010
+            - name: metrics
+              containerPort: 9464
           env:
             - name: Login__ConnectionString__Login
               valueFrom:
@@ -71,10 +76,17 @@ spec:
               mountPath: /certs
               readOnly: true
           readinessProbe:
-            tcpSocket:
-              port: 8500
+            httpGet:
+              path: /ready
+              port: metrics
             initialDelaySeconds: 5
             periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            initialDelaySeconds: 15
+            periodSeconds: 10
       volumes:
         - name: certs
           secret:

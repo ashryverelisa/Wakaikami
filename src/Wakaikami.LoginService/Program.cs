@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Wakaikami.Content.Hosting;
+using Wakaikami.Core.Database.Enums;
 using Wakaikami.Core.Hosting;
 using Wakaikami.Core.Hosting.Enums;
 using Wakaikami.Core.Hosting.Extensions;
@@ -22,6 +23,7 @@ if (!File.Exists(appSettingsPath))
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions { ContentRootPath = AppContext.BaseDirectory });
 
 builder.AddOpenTelemetryLogging();
+builder.AddPrometheusMetrics();
 builder.Services.AddOptionsWithValidateOnStart<LoginOptions, LoginOptionsValidator>().Bind(builder.Configuration.GetSection(LoginOptions.SectionName));
 
 builder.Services.AddLoginDatabase();
@@ -34,6 +36,8 @@ builder.AddServiceModules(
     new ContentDataModuleRegistrations(),
     new LoginServiceModuleRegistrations()
 );
+
+builder.Services.AddHealthChecks().AddGameServerReadiness(DatabaseType.Login);
 
 builder.Services.AddGrpc();
 builder.Services.AddSingleton<WorldLoginAccountService>();
@@ -49,9 +53,12 @@ builder.Services.AddServerLifecycleHostedServices(bootStage: services =>
 
 var grpcPort = builder.Configuration.GetValue("Grpc:Port", 8500);
 builder.WebHost.ConfigureGrpcKestrel(grpcPort, GrpcCertHelper.LoadLoginServerCert());
+builder.WebHost.ConfigureMetricsKestrel(builder.Configuration);
 
 var app = builder.Build();
 
+app.MapPrometheusMetrics();
+app.MapHealthEndpoints();
 app.MapGrpcService<InternalControlService>();
 app.MapGrpcService<WorldLoginAccountService>();
 app.MapGrpcService<WorldPushService>();

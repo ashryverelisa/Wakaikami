@@ -14,9 +14,11 @@ var migrator = builder
     .WithReference(worldDb) // -> ConnectionStrings:World
     .WaitFor(sql);
 
+// Distinct Prometheus ports: all services share the host machine here, unlike in k8s.
 var login = builder
     .AddProject<Wakaikami_LoginService>("login-service")
     .WithEnvironment("Login__ConnectionString__Login", loginDb)
+    .WithEnvironment("Metrics__Port", "9464")
     .WithEndpoint(port: 8500, targetPort: 8500, scheme: "https", name: "grpc-intern", isProxied: false)
     .WaitForCompletion(migrator);
 
@@ -25,6 +27,7 @@ var world = builder
     .WithReference(worldDb) // -> ConnectionStrings:World
     .WithEndpoint(port: 8510, targetPort: 8510, scheme: "https", name: "grpc-intern", isProxied: false)
     .WithEnvironment("Grpc__LoginEndpoint", login.GetEndpoint("grpc-intern"))
+    .WithEnvironment("Metrics__Port", "9465")
     .WaitForCompletion(migrator)
     .WaitFor(login);
 
@@ -32,6 +35,7 @@ var zone = builder
     .AddProject<Wakaikami_ZoneService>("zone-service")
     .WithReference(worldDb) // -> ConnectionStrings:World
     .WithEnvironment("Grpc__WorldEndpoint", world.GetEndpoint("grpc-intern"))
+    .WithEnvironment("Metrics__Port", "9466")
     .WaitForCompletion(migrator)
     .WaitFor(world);
 

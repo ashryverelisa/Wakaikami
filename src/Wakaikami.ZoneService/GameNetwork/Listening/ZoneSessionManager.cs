@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Wakaikami.Networking.Listening;
 using Wakaikami.Networking.Session;
 using Wakaikami.ZoneService.Content.Entity.Character;
+using Wakaikami.ZoneService.Diagnostics;
 using Wakaikami.ZoneService.GameNetwork.Listening.Interfaces;
 using Wakaikami.ZoneService.Grpc.Handlers.Servers;
 
@@ -13,6 +14,21 @@ public sealed class ZoneSessionManager(ushort maxConnection, ISh03ClusterHandler
         IZoneSessionManager
 {
     public int SessionCount => _sessionsBySessionId.Count;
+
+    public int OnlineCharacterCount
+    {
+        get
+        {
+            var count = 0;
+            foreach (var session in _sessionsBySessionId.Values)
+            {
+                if (session.Character is not null)
+                    count++;
+            }
+            return count;
+        }
+    }
+
     protected override TimeSpan TickInterval => _housekeepingInterval;
 
     private readonly ConcurrentDictionary<ushort, ZoneSession> _sessionsBySessionId = new();
@@ -41,15 +57,23 @@ public sealed class ZoneSessionManager(ushort maxConnection, ISh03ClusterHandler
             if (session.Character is null)
             {
                 if (now - session.ConnectionInfo.CreateTime > _connectTimeout)
+                {
+                    ZoneMetrics.SessionTimedOut("connect_timeout");
                     session.Dispose();
+                }
 
                 continue;
             }
 
             if (now - session.ConnectionInfo.LastSync > _syncTimeout)
+            {
+                ZoneMetrics.SessionTimedOut("sync_timeout");
                 session.Dispose();
+            }
             else
+            {
                 session.SendHeartBeat();
+            }
         }
     }
 

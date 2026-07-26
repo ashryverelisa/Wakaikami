@@ -1,6 +1,6 @@
 # Game client entry point (TCP). NodePort 30230 is mapped to host port 9230 in k8s/kind/config.yaml.
-# The zone's game listener only starts after it has registered with the world service, so the
-# readiness probe doubles as a "fully booted" signal.
+# Readiness comes from /ready on the metrics port: lifecycle (data + game modules booted, which
+# implies the zone registered with the world service) plus a live database probe.
 apiVersion: v1
 kind: Service
 metadata:
@@ -15,6 +15,20 @@ spec:
       port: 9230
       targetPort: 9230
       nodePort: 30230
+---
+# Cluster-internal Prometheus scrape target (the zone has no other ClusterIP service).
+apiVersion: v1
+kind: Service
+metadata:
+  name: zone-metrics
+  namespace: wakaikami
+spec:
+  selector:
+    app: zone
+  ports:
+    - name: metrics
+      port: 9464
+      targetPort: 9464
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -38,6 +52,8 @@ spec:
           ports:
             - name: game
               containerPort: 9230
+            - name: metrics
+              containerPort: 9464
           env:
             - name: ConnectionStrings__World
               valueFrom:
@@ -55,10 +71,17 @@ spec:
               mountPath: /certs
               readOnly: true
           readinessProbe:
-            tcpSocket:
-              port: 9230
+            httpGet:
+              path: /ready
+              port: metrics
             initialDelaySeconds: 10
             periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            initialDelaySeconds: 20
+            periodSeconds: 10
       volumes:
         - name: certs
           secret:

@@ -14,3 +14,5 @@ nodes:
         hostPort: 9230
       - containerPort: 30080 # web NodePort
         hostPort: 8080
+      - containerPort: 30300 # grafana NodePort
+        hostPort: 3000
