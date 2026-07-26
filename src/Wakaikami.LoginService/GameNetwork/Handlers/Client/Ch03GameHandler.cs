@@ -5,6 +5,7 @@ using Wakaikami.Content.Account;
 using Wakaikami.Content.World.Enums;
 using Wakaikami.LoginService.Configuration;
 using Wakaikami.LoginService.Content.Account;
+using Wakaikami.LoginService.Diagnostics;
 using Wakaikami.LoginService.Content.Account.Interfaces;
 using Wakaikami.LoginService.Content.Transfer;
 using Wakaikami.LoginService.Content.World.Interfaces;
@@ -94,6 +95,7 @@ public partial class Ch03GameHandler(
             return;
         }
 
+        LoginMetrics.LoginSucceeded();
         LogLoginSucceeded(packet.Username, accountId, session.ConnectionInfo.RemoteEndPoint);
         sh03GameHandler.NcUserLoginAck(session);
     }
@@ -189,6 +191,7 @@ public partial class Ch03GameHandler(
 
     private void FailLogin(LoginSession session, string username, UserErrors error)
     {
+        LoginMetrics.LoginFailed(error);
         sh03GameHandler.NcUserLoginFailAck(session, error);
 
         session.FailedLoginAttempts++;

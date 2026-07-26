@@ -1,5 +1,7 @@
 ﻿using System.Collections.Frozen;
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Wakaikami.Networking.Diagnostics;
 using Wakaikami.Networking.HandlerStores.Interfaces;
 using Wakaikami.Networking.HandlerStores.Registration;
 using Wakaikami.Networking.HandlerTypes;
@@ -87,12 +89,20 @@ public sealed partial class FiestaHandlerStore(
                 return;
 
             if (_handlers.TryGetValue(packet.Header, out var inner) && inner.TryGetValue(packet.Type, out var handler))
+            {
+                var start = Stopwatch.GetTimestamp();
                 await handler.Handle(services, session, packet);
+                NetworkingMetrics.PacketHandled(packet.Header, packet.Type, Stopwatch.GetElapsedTime(start).TotalSeconds);
+            }
             else
+            {
+                NetworkingMetrics.PacketUnhandled(packet.Header, packet.Type);
                 LogUnhandledPacket(packet.ToString());
+            }
         }
         catch (Exception ex)
         {
+            NetworkingMetrics.PacketFaulted(packet.Header, packet.Type);
             LogHandlingFailed(ex, packet.GetType().Name, packet);
         }
     }

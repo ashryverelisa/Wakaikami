@@ -37,6 +37,13 @@
     />
     <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.9" />
   </ItemGroup>
+  <ItemGroup Label="Health Checks">
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.9" />
+    <PackageVersion
+      Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore"
+      Version="10.0.9"
+    />
+  </ItemGroup>
   <ItemGroup Label="Logging">
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.9" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
@@ -52,8 +59,13 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.9" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
   </ItemGroup>
-  <ItemGroup Label="Telemetry (OTLP export to Aspire dashboard)">
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.16.0" />
+  <ItemGroup Label="Telemetry (OTLP export to Aspire dashboard, Prometheus scrape endpoint)">
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.17.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.17.0" />
+    <PackageVersion
+      Include="OpenTelemetry.Exporter.Prometheus.AspNetCore"
+      Version="1.17.0-beta.1"
+    />
   </ItemGroup>
   <ItemGroup Label="gRPC">
     <PackageVersion Include="Google.Protobuf" Version="3.35.1" />

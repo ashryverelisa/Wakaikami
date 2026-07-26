@@ -12,6 +12,9 @@ spec:
     - name: grpc
       port: 8510
       targetPort: 8510
+    - name: metrics
+      port: 9464
+      targetPort: 9464
 ---
 # Game client entry point (TCP). NodePort 30120 is mapped to host port 9120 in k8s/kind/config.yaml.
 # World__WorldInfo__ConnectIP below is the address advertised to game clients and must resolve to
@@ -55,6 +58,8 @@ spec:
               containerPort: 8510
             - name: game
               containerPort: 9120
+            - name: metrics
+              containerPort: 9464
           env:
             - name: ConnectionStrings__World
               valueFrom:
@@ -72,10 +77,17 @@ spec:
               mountPath: /certs
               readOnly: true
           readinessProbe:
-            tcpSocket:
-              port: 8510
+            httpGet:
+              path: /ready
+              port: metrics
             initialDelaySeconds: 5
             periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            initialDelaySeconds: 15
+            periodSeconds: 10
       volumes:
         - name: certs
           secret:

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Wakaikami.Core.Time;
+using Wakaikami.Networking.Diagnostics;
 using Wakaikami.Networking.Session;
 
 namespace Wakaikami.Networking.Listening;
@@ -75,11 +76,15 @@ public abstract class SessionManagerBase<TSession>(ushort maxConnection, ILogger
         ArgumentNullException.ThrowIfNull(session);
 
         if (SessionList.Count >= maxConnection)
+        {
+            NetworkingMetrics.SessionRejected(GetType().Name);
             return false;
+        }
 
         if (!SessionList.TryAdd(session, 0))
             return false;
 
+        NetworkingMetrics.SessionAccepted(GetType().Name);
         session.OnDispose += (_, _) => RemoveSession(session);
         return true;
     }
@@ -92,6 +97,7 @@ public abstract class SessionManagerBase<TSession>(ushort maxConnection, ILogger
         if (!SessionList.TryRemove(session, out _))
             return false;
 
+        NetworkingMetrics.SessionRemoved(GetType().Name);
         return true;
     }
 

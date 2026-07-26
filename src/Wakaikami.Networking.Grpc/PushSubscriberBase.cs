@@ -1,12 +1,17 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Wakaikami.Networking.Grpc.Diagnostics;
+using Wakaikami.Networking.Grpc.Health;
 
 namespace Wakaikami.Networking.Grpc;
 
-public abstract class PushSubscriberBase<TPush>(ILogger logger) : BackgroundService
+public abstract class PushSubscriberBase<TPush>(ILogger logger) : BackgroundService, IPushStreamStatus
 {
     private static readonly TimeSpan _reconnectDelay = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan _registerRetryDelay = TimeSpan.FromSeconds(3);
+
+    private volatile bool _isStreamConnected;
+    public bool IsStreamConnected => _isStreamConnected;
 
     protected ILogger Logger { get; } = logger;
 
@@ -103,6 +108,8 @@ public abstract class PushSubscriberBase<TPush>(ILogger logger) : BackgroundServ
                     if (!live)
                     {
                         live = true;
+                        _isStreamConnected = true;
+                        GrpcLinkMetrics.StreamLive(GetType().Name);
                         OnSubscriptionLive(connectionCts.Token);
                     }
 
@@ -115,6 +122,7 @@ public abstract class PushSubscriberBase<TPush>(ILogger logger) : BackgroundServ
             }
             catch (Exception ex)
             {
+                GrpcLinkMetrics.StreamDropped(GetType().Name);
                 Logger.PushStreamDropped(ex, StreamDescription, _reconnectDelay.TotalSeconds);
                 try
                 {
@@ -127,6 +135,7 @@ public abstract class PushSubscriberBase<TPush>(ILogger logger) : BackgroundServ
             }
             finally
             {
+                _isStreamConnected = false;
                 await connectionCts.CancelAsync();
                 connectionCts.Dispose();
             }
