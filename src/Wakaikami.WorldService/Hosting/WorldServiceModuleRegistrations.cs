@@ -13,6 +13,8 @@ using Wakaikami.Networking.Grpc.Messages.WorldLoginAccount;
 using Wakaikami.Networking.Grpc.Messages.WorldLoginRegistration;
 using Wakaikami.Networking.Grpc.Messages.WorldPush;
 using Wakaikami.WorldService.Configuration;
+using Wakaikami.WorldService.Content.Entity.Character;
+using Wakaikami.WorldService.Content.Entity.Character.Interfaces;
 using Wakaikami.WorldService.Content.Zone;
 using Wakaikami.WorldService.Core;
 using Wakaikami.WorldService.GameNetwork.Listening;
@@ -37,6 +39,8 @@ public sealed class WorldServiceModuleRegistrations : IServiceRegistrar
             sp.GetRequiredService<ILogger<WorldSessionManager>>()
         ));
         services.AddHostedService(sp => sp.GetRequiredService<WorldSessionManager>());
+
+        services.AddSingletonAs<CharacterManager, ICharacterManager>();
 
         services.AddWorldServicePacketHandlers();
 

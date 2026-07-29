@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Wakaikami.Networking.Protocol.Fiesta.Enums;
 
 namespace Wakaikami.WorldService;
 
@@ -18,4 +19,7 @@ internal static partial class LoggerMessages
 
     [LoggerMessage(EventId = 5, Level = LogLevel.Error, Message = "Invalid AwaitingZone Count need more as Zero")]
     public static partial void InvalidAwaitingZoneCount(this ILogger logger);
+
+    [LoggerMessage(EventId = 6, Level = LogLevel.Warning, Message = "Ignored unknown logout type {LogoutType} from {RemoteEndPoint}")]
+    public static partial void UnknownLogoutType(this ILogger logger, LogoutType logoutType, string remoteEndPoint);
 }

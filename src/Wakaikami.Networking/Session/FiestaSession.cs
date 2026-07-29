@@ -20,7 +20,13 @@ public abstract class FiestaSession : SessionBase
     public override void SendPacket<TPacket>(TPacket packet, bool destroy = true)
     {
         if (IsDisposed)
+        {
+            // Same contract as SessionBase.SendPacket's disposed path: we took ownership of the packet,
+            // so its pooled writer buffer has to be released even though nothing goes out on the wire.
+            if (destroy)
+                packet.Dispose();
             return;
+        }
 
         if (packet is FiestaServerPacket { Writer.Length: 0 })
         {
