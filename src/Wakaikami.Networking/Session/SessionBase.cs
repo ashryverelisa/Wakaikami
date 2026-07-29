@@ -13,6 +13,11 @@ public abstract partial class SessionBase : IDisposable, IAsyncDisposable
 {
     private const int MinReceiveBufferSize = 4096;
     private const int SendQueueCapacity = 256;
+    private Task _sendLoopCompleted = Task.CompletedTask;
+    private static readonly TimeSpan FlushOnCloseTimeout = TimeSpan.FromSeconds(2);
+
+    private int _closing;
+    public bool IsClosing => Volatile.Read(ref _closing) != 0;
 
     // The [LoggerMessage] generator binds to an ILogger *field* (SYSLIB1019); derived classes use the property.
     private readonly ILogger _logger;
@@ -28,9 +33,9 @@ public abstract partial class SessionBase : IDisposable, IAsyncDisposable
 
     internal IPacketParser? DataParser { get; set; }
 
-    public bool IsConnected => !IsDisposed && PSocket.Connected;
+    public bool IsConnected => !IsDisposed && Socket.Connected;
 
-    internal Socket PSocket { get; }
+    internal Socket Socket { get; }
 
     private readonly Pipe _receivePipe = new();
 
@@ -49,9 +54,8 @@ public abstract partial class SessionBase : IDisposable, IAsyncDisposable
     protected SessionBase(Socket connectSocket, ILogger logger)
     {
         _logger = logger;
-        PSocket = connectSocket;
-        ConnectionInfo = new SessionInfo { RemoteEndPoint = PSocket.RemoteEndPoint?.ToString() ?? "0.0.0.0" };
-
+        Socket = connectSocket;
+        ConnectionInfo = new SessionInfo { RemoteEndPoint = Socket.RemoteEndPoint?.ToString() ?? "0.0.0.0" };
         SessionToken = _cts.Token;
     }
 
@@ -64,6 +68,7 @@ public abstract partial class SessionBase : IDisposable, IAsyncDisposable
         var receiveLoop = Task.Run(() => FillReceivePipeAsync(ct), ct);
         var parseLoop = Task.Run(() => ReadReceivePipeAsync(ct), ct);
         var sendLoop = Task.Run(() => SendLoopAsync(ct), ct);
+        Volatile.Write(ref _sendLoopCompleted, sendLoop);
 
         _loopsCompleted = Task.WhenAll(receiveLoop, parseLoop, sendLoop);
         _ = _loopsCompleted.ContinueWith(
@@ -92,7 +97,7 @@ public abstract partial class SessionBase : IDisposable, IAsyncDisposable
                 int received;
                 try
                 {
-                    received = await PSocket.ReceiveAsync(memory, SocketFlags.None, ct);
+                    received = await Socket.ReceiveAsync(memory, SocketFlags.None, ct);
                 }
                 catch (OperationCanceledException)
                 {
@@ -208,7 +213,7 @@ public abstract partial class SessionBase : IDisposable, IAsyncDisposable
     public virtual void SendPacket<TPacket>(TPacket packet, bool destroy = true)
         where TPacket : IServerPacket
     {
-        if (IsDisposed || !PSocket.Connected)
+        if (IsDisposed || !Socket.Connected)
         {
             if (destroy)
                 packet.Dispose();
@@ -244,7 +249,7 @@ public abstract partial class SessionBase : IDisposable, IAsyncDisposable
 
     public void SendRaw(ReadOnlySpan<byte> wireBytes)
     {
-        if (IsDisposed || !PSocket.Connected)
+        if (IsDisposed || !Socket.Connected)
         {
             Dispose();
             return;
@@ -256,7 +261,9 @@ public abstract partial class SessionBase : IDisposable, IAsyncDisposable
         if (!_sendChannel.Writer.TryWrite(new PooledSegment(rented, wireBytes.Length)))
         {
             ArrayPool<byte>.Shared.Return(rented);
-            Dispose();
+
+            if (!IsClosing)
+                Dispose();
         }
     }
 
@@ -274,7 +281,7 @@ public abstract partial class SessionBase : IDisposable, IAsyncDisposable
                         int sent;
                         try
                         {
-                            sent = await PSocket.SendAsync(memory, SocketFlags.None, ct);
+                            sent = await Socket.SendAsync(memory, SocketFlags.None, ct);
                         }
                         catch (OperationCanceledException)
                         {
@@ -324,6 +331,32 @@ public abstract partial class SessionBase : IDisposable, IAsyncDisposable
         }
     }
 
+    public void CloseAfterFlush()
+    {
+        if (IsDisposed || Interlocked.Exchange(ref _closing, 1) != 0)
+            return;
+
+        // Completing the writer is what lets the send loop finish by itself: ReadAllAsync ends normally
+        // once the queue is empty. Cancelling instead (what Dispose does) is exactly the drop we avoid.
+        _sendChannel.Writer.TryComplete();
+
+        _ = FinishCloseAsync();
+    }
+
+    private async Task FinishCloseAsync()
+    {
+        try
+        {
+            await Volatile.Read(ref _sendLoopCompleted).WaitAsync(FlushOnCloseTimeout, CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            LogFlushOnCloseFailed(ex, ConnectionInfo.RemoteEndPoint);
+        }
+
+        Dispose();
+    }
+
     protected virtual void DisposeInternal() { }
 
     public void Dispose()
@@ -346,7 +379,7 @@ public abstract partial class SessionBase : IDisposable, IAsyncDisposable
                     ArrayPool<byte>.Shared.Return(leftover.Buffer);
             }
         }
-        PSocket.Kill();
+        Socket.Kill();
         GC.SuppressFinalize(this);
     }
 
@@ -393,4 +426,7 @@ public abstract partial class SessionBase : IDisposable, IAsyncDisposable
 
     [LoggerMessage(EventId = 7, Level = LogLevel.Debug, Message = "One or more session loops threw during disposal (expected on forced disconnect)")]
     private partial void LogLoopsFaultedOnDispose(Exception exception);
+
+    [LoggerMessage(EventId = 8, Level = LogLevel.Debug, Message = "Flush before close did not finish for {RemoteEndPoint}; dropping the queued packets")]
+    private partial void LogFlushOnCloseFailed(Exception exception, string remoteEndPoint);
 }
