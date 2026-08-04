@@ -52,9 +52,8 @@ public sealed class AccountTransferManager(UpdateManager updateManager, IAccount
         if (!FinishTransfer(tf.AuthId, out _))
             return;
 
-        if (tf.Session?.IsConnected != true)
-            return;
-
+        // Still connected: the client learns why, and the teardown releases the claim on its way out -
+        // FinishTransfer above already ran, so LoginSessionManager no longer sees a transfer in flight.
         if (tf.Session?.IsConnected == true)
         {
             tf.Session.SendPacket(new NcUserLoginFailAck(UserErrors.LoginTimeout));
@@ -62,6 +61,7 @@ public sealed class AccountTransferManager(UpdateManager updateManager, IAccount
             return;
         }
 
+        // The session is already gone, so nothing else will ever hand the account back.
         presence.ReleaseIfOwnedBy(tf.Account.Id, PresenceOwner.Login);
     }
 

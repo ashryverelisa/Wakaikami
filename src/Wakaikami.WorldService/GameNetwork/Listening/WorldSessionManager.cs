@@ -71,11 +71,15 @@ public class WorldSessionManager(ushort maxConnection, ISh03ClusterHandler sh03C
         if (session == null || !base.RemoveSession(session))
             return false;
 
-        if (session.Account == null)
+        if (session.Account is not { } account)
             return true;
 
-        _sessionsByAccountId.TryRemove(session.Account.Id, out _);
-        sh03Cluster.NcAccountOffline(session.Account);
+        // Remove by key AND value: a ghost whose teardown runs late no longer owns the id entry, so it
+        // must not report the replacement that took its place offline.
+        if (!_sessionsByAccountId.TryRemove(new KeyValuePair<int, WorldSession>(account.Id, session)))
+            return true;
+
+        sh03Cluster.NcAccountOffline(account);
         return true;
     }
 }

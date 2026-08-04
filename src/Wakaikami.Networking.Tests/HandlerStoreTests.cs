@@ -9,7 +9,6 @@ using Xunit;
 
 namespace Wakaikami.Networking.Tests;
 
-[Collection("PacketStream")]
 public sealed class HandlerStoreTests
 {
     private static byte[] EmptyPacketData => [0x00];

@@ -24,7 +24,6 @@
     <Project Path="Wakaikami.LoginService.Tests/Wakaikami.LoginService.Tests.csproj" />
     <Project Path="Wakaikami.Networking.Tests/Wakaikami.Networking.Tests.csproj" />
     <Project Path="Wakaikami.WorldService.Tests/Wakaikami.WorldService.Tests.csproj" />
-    <Project Path="Wakaikami.ZoneService.Tests/Wakaikami.ZoneService.Tests.csproj" />
   </Folder>
   <Project Path="Wakaikami.AppHost/Wakaikami.AppHost.csproj" />
   <Project Path="Wakaikami.Web/Wakaikami.Web.csproj" />
