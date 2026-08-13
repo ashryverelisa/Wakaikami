@@ -90,3 +90,10 @@ csharp_using_directive_placement = outside_namespace:warning
 # severity
 dotnet_diagnostic.MA0004.severity = none
 dotnet_diagnostic.MA0051.severity = suggestion
+
+# Fiesta stuff
+dotnet_diagnostic.CA5351.severity = none
+dotnet_diagnostic.CA1720.severity = none
+dotnet_diagnostic.MA0048.severity = suggestion
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1861.severity = none

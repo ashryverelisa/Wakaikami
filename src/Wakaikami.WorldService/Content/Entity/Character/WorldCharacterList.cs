@@ -6,6 +6,19 @@ public sealed class WorldCharacterList
 {
     public int Count => _bySlot.Count;
 
+    public ushort HighestLevel
+    {
+        get
+        {
+            ushort level = 1;
+            foreach (var entry in _bySlot.Values)
+                if (entry.Level > level)
+                    level = entry.Level;
+
+            return level;
+        }
+    }
+
     private readonly ConcurrentDictionary<byte, CharacterListEntry> _bySlot = new();
 
     public bool Add(CharacterListEntry entry) => _bySlot.TryAdd(entry.Slot, entry);

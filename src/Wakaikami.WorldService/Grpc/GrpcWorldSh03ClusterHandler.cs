@@ -42,4 +42,6 @@ public sealed class GrpcWorldSh03ClusterHandler(
         );
         return reply.Found ? new GameAccount { Id = reply.AccountId, Name = reply.AccountName } : null;
     }
+
+    public void NcAccountCharacterCreate(int accountId) => client.CharacterCreateAsync(new CharacterCreateRequest { AccountId = accountId }).Forget(logger);
 }

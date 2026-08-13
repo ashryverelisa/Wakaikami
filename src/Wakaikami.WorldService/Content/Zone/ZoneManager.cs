@@ -30,7 +30,7 @@ public class ZoneManager(IOptions<WorldOptions> options, IZonePushHub pushHub, I
 
         for (byte i = 0; i < maxConnection; i++)
         {
-            _zonesById.TryAdd(i, new ZoneServer(i, pushHub));
+            _zonesById.TryAdd(i, new ZoneServer(i));
         }
 
         return Task.FromResult(true);

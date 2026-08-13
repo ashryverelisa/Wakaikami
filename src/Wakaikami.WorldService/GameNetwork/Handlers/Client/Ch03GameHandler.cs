@@ -3,7 +3,6 @@ using Wakaikami.Content.Account;
 using Wakaikami.Networking.HandlerStores.Attributes;
 using Wakaikami.Networking.HandlerTypes;
 using Wakaikami.Networking.Protocol.Fiesta.Enums;
-using Wakaikami.WorldService.Content.Entity.Character.Interfaces;
 using Wakaikami.WorldService.GameNetwork.Handlers.Server;
 using Wakaikami.WorldService.GameNetwork.Listening;
 using Wakaikami.WorldService.GameNetwork.Listening.Interfaces;
@@ -15,7 +14,6 @@ namespace Wakaikami.WorldService.GameNetwork.Handlers.Client;
 
 [GameHandlerClass(FiestaHandlerType.User)]
 public class Ch03GameHandler(
-    ICharacterManager characterManager,
     IWorldSessionManager worldSessions,
     ISh03GameHandler sh03GameHandler,
     ISh03ClusterHandler sh03Cluster,

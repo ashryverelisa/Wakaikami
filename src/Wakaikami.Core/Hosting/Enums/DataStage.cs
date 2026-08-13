@@ -1,3 +1,9 @@
 ﻿namespace Wakaikami.Core.Hosting.Enums;
 
-public enum DataStage { }
+public enum DataStage
+{
+    TextFilter,
+    DefaultData,
+    Maps,
+    Character,
+}
