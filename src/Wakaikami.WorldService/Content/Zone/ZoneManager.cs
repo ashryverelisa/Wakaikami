@@ -5,11 +5,10 @@ using Microsoft.Extensions.Options;
 using Wakaikami.Core.Hosting.Enums;
 using Wakaikami.Core.Hosting.Interfaces;
 using Wakaikami.WorldService.Configuration;
-using Wakaikami.WorldService.Grpc.Interfaces;
 
 namespace Wakaikami.WorldService.Content.Zone;
 
-public class ZoneManager(IOptions<WorldOptions> options, IZonePushHub pushHub, ILogger<ZoneManager> logger) : IGameServerModule
+public class ZoneManager(IOptions<WorldOptions> options, ILogger<ZoneManager> logger) : IGameServerModule
 {
     private ConcurrentDictionary<byte, ZoneServer> _zonesById = new();
 
