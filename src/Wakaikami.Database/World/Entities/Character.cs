@@ -22,11 +22,12 @@ public class Character
     public string? KqHandle { get; set; }
     public DateTime? KqDate { get; set; }
     public int LoginCount { get; set; }
-    public byte RnFlag { get; set; }
+    public byte IsRename { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? LastLogin { get; set; }
     public ushort FriendPoints { get; set; }
     public ushort LastFriendPoint { get; set; }
+    public int KillCount { get; set; }
 
     // 1:1 sub-tables
     public CharacterShape? Shape { get; set; }

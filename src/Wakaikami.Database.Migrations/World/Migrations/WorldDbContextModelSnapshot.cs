@@ -78,6 +78,12 @@ namespace Wakaikami.Database.Migrations.World.Migrations
                     b.Property<int>("HpStones")
                         .HasColumnType("int");
 
+                    b.Property<byte>("IsRename")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int>("KillCount")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("KqDate")
                         .HasColumnType("datetime2");
 
@@ -118,9 +124,6 @@ namespace Wakaikami.Database.Migrations.World.Migrations
 
                     b.Property<int>("PosY")
                         .HasColumnType("int");
-
-                    b.Property<byte>("RnFlag")
-                        .HasColumnType("tinyint");
 
                     b.Property<byte>("Slot")
                         .HasColumnType("tinyint");
