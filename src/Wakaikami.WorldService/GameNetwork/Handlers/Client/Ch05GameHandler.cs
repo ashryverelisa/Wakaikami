@@ -69,6 +69,7 @@ public class Ch05GameHandler(
             MapIndex = info.StartMap.Index,
             StartPosition = info.StartPosition,
             Level = info.StartLevel,
+            Exp = info.StartExp,
             Money = info.Money,
             Hp = info.Hp,
             Sp = info.Sp,

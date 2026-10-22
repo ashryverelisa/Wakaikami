@@ -31,6 +31,12 @@ public abstract partial class CharacterBase : IDisposable
     public Vector2 Position { get; set; }
     public CharacterShape Shape { get; } = new();
 
+    public void SetMap(string mapIndex, ushort instanceId = 0)
+    {
+        MapIndex = mapIndex;
+        InstanceId = instanceId;
+    }
+
     public void Send(FiestaServerPacket packet, bool destroy = true)
     {
         if (Session is { } session)

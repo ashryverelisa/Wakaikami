@@ -14,6 +14,7 @@ public readonly record struct CreateCharacterRequest
     public required string MapIndex { get; init; }
     public required Vector2 StartPosition { get; init; }
     public required byte Level { get; init; }
+    public required ulong Exp { get; init; }
     public required long Money { get; init; }
     public required int Hp { get; init; }
     public required int Sp { get; init; }

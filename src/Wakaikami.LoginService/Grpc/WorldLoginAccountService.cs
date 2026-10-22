@@ -73,6 +73,15 @@ public sealed partial class WorldLoginAccountService(IAccountPresence presence, 
         return Task.FromResult(new TransferGetReply { Found = false });
     }
 
+    public override Task<Empty> CharacterCreate(CharacterCreateRequest request, ServerCallContext context)
+    {
+        LogCharacterCreated(request.AccountId);
+        return Task.FromResult(new Empty());
+    }
+
     [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "Account report carried an invalid world id {WorldId}; presence left unchanged")]
     private partial void LogInvalidWorldId(int worldId);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Debug, Message = "Account {AccountId} created a character")]
+    private partial void LogCharacterCreated(int accountId);
 }

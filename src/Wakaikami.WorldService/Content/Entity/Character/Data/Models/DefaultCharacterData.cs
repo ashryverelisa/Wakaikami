@@ -37,10 +37,16 @@ public class DefaultCharacterData
 
     [ShineTableColumn("Money")]
     public long Money { get; set; }
+
+    [ShineTableColumn("InitLV")]
     public byte StartLevel { get; set; }
 
     [ShineTableColumn("MinLv")]
     public short MinLevel { get; set; }
+
+    [ShineTableColumn("InitEXP")]
+    public ulong StartExp { get; set; }
+
     public ClassName ClassId { get; set; } = null!;
     public MapInfo StartMap { get; set; } = null!;
     public Vector2 StartPosition => new(StartX, StartY);

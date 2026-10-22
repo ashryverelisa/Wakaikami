@@ -3,6 +3,7 @@ using Wakaikami.Content.Account;
 using Wakaikami.Networking.HandlerStores.Attributes;
 using Wakaikami.Networking.HandlerTypes;
 using Wakaikami.Networking.Protocol.Fiesta.Enums;
+using Wakaikami.WorldService.Content.Entity.Character;
 using Wakaikami.WorldService.GameNetwork.Handlers.Server;
 using Wakaikami.WorldService.GameNetwork.Listening;
 using Wakaikami.WorldService.GameNetwork.Listening.Interfaces;
@@ -17,6 +18,7 @@ public class Ch03GameHandler(
     IWorldSessionManager worldSessions,
     ISh03GameHandler sh03GameHandler,
     ISh03ClusterHandler sh03Cluster,
+    CharacterRosterService characterRosterService,
     ILogger<Ch03GameHandler> logger
 )
 {
@@ -74,6 +76,12 @@ public class Ch03GameHandler(
         if (account is null || !worldSessions.AddSession(session, account))
         {
             FailAndClose(session, UserErrorCodes.LoginInvalidCredentials);
+            return;
+        }
+
+        if (!await characterRosterService.LoadCharacterListAsync(account.Id, session.CharacterList, session.SessionToken))
+        {
+            FailAndClose(session, UserErrorCodes.LoginDatabaseError);
             return;
         }
 

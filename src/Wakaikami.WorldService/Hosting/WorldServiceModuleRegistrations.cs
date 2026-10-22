@@ -8,12 +8,14 @@ using Wakaikami.Core.Database.Extensions;
 using Wakaikami.Core.Extensions;
 using Wakaikami.Core.Hosting.Enums;
 using Wakaikami.Core.Hosting.Interfaces;
+using Wakaikami.Database.World.Extensions;
 using Wakaikami.Networking.Grpc.Helpers;
 using Wakaikami.Networking.Grpc.Messages.WorldLoginAccount;
 using Wakaikami.Networking.Grpc.Messages.WorldLoginRegistration;
 using Wakaikami.Networking.Grpc.Messages.WorldPush;
 using Wakaikami.WorldService.Configuration;
 using Wakaikami.WorldService.Content.Entity.Character;
+using Wakaikami.WorldService.Content.Entity.Character.Data;
 using Wakaikami.WorldService.Content.Entity.Character.Interfaces;
 using Wakaikami.WorldService.Content.Zone;
 using Wakaikami.WorldService.Core;
@@ -32,6 +34,7 @@ public sealed class WorldServiceModuleRegistrations : IServiceRegistrar
         services.AddSingletonAs<ServerMain, IServerLifecycle>();
 
         services.AddDatabase(configuration, DatabaseType.World, "ConnectionStrings:World");
+        services.AddWorldDatabase();
 
         services.AddSingletonAs<WorldSessionManager, IWorldSessionManager>(sp => new WorldSessionManager(
             sp.GetRequiredService<IOptions<WorldOptions>>().Value.WorldInfo.MaxConnection,
@@ -41,6 +44,13 @@ public sealed class WorldServiceModuleRegistrations : IServiceRegistrar
         services.AddHostedService(sp => sp.GetRequiredService<WorldSessionManager>());
 
         services.AddSingletonAs<CharacterManager, ICharacterManager>();
+
+        services.AddSingletonAs<CharacterShapeProvider, IDataLoader>();
+        services.AddSingletonAs<CharacterClassProvider, IDataLoader>();
+        services.AddSingletonAs<DefaultCharacterDataProvider, IDataLoader>();
+        services.AddSingleton<CharacterNameValidator>();
+        services.AddSingletonAs<DetachedCharacterLoader, IDetachedCharacterLoader>();
+        services.AddSingleton<CharacterRosterService>();
 
         services.AddWorldServicePacketHandlers();
 
@@ -57,6 +67,8 @@ public sealed class WorldServiceModuleRegistrations : IServiceRegistrar
             services.AddSingleton(sp => new WorldLoginRegistration.WorldLoginRegistrationClient(sp.GetRequiredService<GrpcChannel>()));
             services.AddSingleton<ISh03ClusterHandler, GrpcWorldSh03ClusterHandler>();
         }
+
+        services.AddSingleton<ISh04ClusterHandler, WorldSh04ClusterHandler>();
 
         services.AddSingletonAs<WorldServer, IShutdownHandler>();
 

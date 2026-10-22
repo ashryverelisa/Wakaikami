@@ -13,7 +13,7 @@ public class Character
     public int Lp { get; set; }
     public ushort HpStones { get; set; }
     public ushort SpStones { get; set; }
-    public long Exp { get; set; }
+    public ulong Exp { get; set; }
     public int Fame { get; set; }
     public int PosX { get; set; }
     public int PosY { get; set; }
@@ -29,9 +29,14 @@ public class Character
     public ushort LastFriendPoint { get; set; }
     public int KillCount { get; set; }
 
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+
     // 1:1 sub-tables
     public CharacterShape? Shape { get; set; }
     public CharacterStatPoints? StatPoints { get; set; }
     public CharacterTutorial? Tutorial { get; set; }
     public CharacterOptions? Options { get; set; }
+
+    public ICollection<CharacterSkill> Skills { get; set; } = [];
 }

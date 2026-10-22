@@ -60,6 +60,9 @@ namespace Wakaikami.Database.Migrations.World.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<byte>("Direction")
                         .HasColumnType("tinyint");
 
@@ -77,6 +80,9 @@ namespace Wakaikami.Database.Migrations.World.Migrations
 
                     b.Property<int>("HpStones")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<byte>("IsRename")
                         .HasColumnType("tinyint");
@@ -140,7 +146,8 @@ namespace Wakaikami.Database.Migrations.World.Migrations
                         .IsUnique();
 
                     b.HasIndex("AccountId", "Slot")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("character", (string)null);
                 });
@@ -202,6 +209,37 @@ namespace Wakaikami.Database.Migrations.World.Migrations
                     b.HasKey("CharacterId");
 
                     b.ToTable("characterShape", (string)null);
+                });
+
+            modelBuilder.Entity("Wakaikami.Database.World.Entities.CharacterSkill", b =>
+                {
+                    b.Property<int>("CharacterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SkillId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CoolTime")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("EmpowerCoolTime")
+                        .HasColumnType("tinyint");
+
+                    b.Property<byte>("EmpowerDamage")
+                        .HasColumnType("tinyint");
+
+                    b.Property<byte>("EmpowerKeepTime")
+                        .HasColumnType("tinyint");
+
+                    b.Property<byte>("EmpowerSp")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int>("Mastery")
+                        .HasColumnType("int");
+
+                    b.HasKey("CharacterId", "SkillId");
+
+                    b.ToTable("characterSkill", (string)null);
                 });
 
             modelBuilder.Entity("Wakaikami.Database.World.Entities.CharacterStatPoints", b =>
@@ -276,6 +314,17 @@ namespace Wakaikami.Database.Migrations.World.Migrations
                     b.Navigation("Character");
                 });
 
+            modelBuilder.Entity("Wakaikami.Database.World.Entities.CharacterSkill", b =>
+                {
+                    b.HasOne("Wakaikami.Database.World.Entities.Character", "Character")
+                        .WithMany("Skills")
+                        .HasForeignKey("CharacterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Character");
+                });
+
             modelBuilder.Entity("Wakaikami.Database.World.Entities.CharacterStatPoints", b =>
                 {
                     b.HasOne("Wakaikami.Database.World.Entities.Character", "Character")
@@ -303,6 +352,8 @@ namespace Wakaikami.Database.Migrations.World.Migrations
                     b.Navigation("Options");
 
                     b.Navigation("Shape");
+
+                    b.Navigation("Skills");
 
                     b.Navigation("StatPoints");
 

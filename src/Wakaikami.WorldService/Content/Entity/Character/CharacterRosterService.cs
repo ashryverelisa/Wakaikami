@@ -1,11 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
 using Wakaikami.Database.World.Repositories.Interfaces;
 using Wakaikami.WorldService.Content.Entity.Character.Enums;
+using Wakaikami.WorldService.Content.Entity.Character.Interfaces;
 using Wakaikami.WorldService.Content.Entity.Character.Results;
 
 namespace Wakaikami.WorldService.Content.Entity.Character;
 
-public sealed partial class CharacterRosterService(ICharacterRepository characterRepository, ILogger<CharacterRosterService> logger)
+public sealed partial class CharacterRosterService(
+    ICharacterRepository characterRepository,
+    IDetachedCharacterLoader detachedCharacterLoader,
+    ILogger<CharacterRosterService> logger
+)
 {
     private static class CreateCode
     {
@@ -33,6 +38,7 @@ public sealed partial class CharacterRosterService(ICharacterRepository characte
                 req.Name,
                 req.Slot,
                 req.Level,
+                req.Exp,
                 req.Money,
                 req.Hp,
                 req.Sp,
@@ -65,7 +71,8 @@ public sealed partial class CharacterRosterService(ICharacterRepository characte
 
             LogCharacterCreated(req.Name);
 
-            // TODO: Skills load
+            if (req.Skills is { Count: > 0 } skills)
+                await GrantDefaultSkillsAsync(res.CharId, req.Name, skills);
 
             return CreateCharacterResult.Created(res.CharId);
         }
@@ -78,6 +85,57 @@ public sealed partial class CharacterRosterService(ICharacterRepository characte
             LogCreateFailed(ex);
             return CreateCharacterResult.Failed(CharacterCreateOutcome.Failed);
         }
+    }
+
+    private async Task GrantDefaultSkillsAsync(int charId, string name, IReadOnlySet<ushort> skills)
+    {
+        try
+        {
+            var granted = await characterRepository.AddSkillsAsync(charId, skills, CancellationToken.None);
+            LogDefaultSkillsGranted(granted, name);
+        }
+        catch (Exception ex)
+        {
+            LogDefaultSkillsFailed(ex, skills.Count, name, charId);
+        }
+    }
+
+    public async Task<bool> LoadCharacterListAsync(int accountId, WorldCharacterList characterList, CancellationToken cancellationToken = default)
+    {
+        IReadOnlyList<int> characterIds;
+        try
+        {
+            characterIds = await characterRepository.GetCharacterListAsync(accountId, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            LogCharacterListFailed(ex, accountId);
+            return false;
+        }
+
+        characterList.Clear();
+
+        foreach (var characterId in characterIds)
+        {
+            var (character, error) = await detachedCharacterLoader.TryLoadAsync(characterId, cancellationToken);
+            if (character is null)
+            {
+                LogCharacterListEntrySkipped(characterId, accountId, error);
+                continue;
+            }
+
+            using (character)
+            {
+                if (!characterList.Add(new CharacterListEntry(character)))
+                    LogCharacterListSlotConflict(characterId, character.Slot, accountId);
+            }
+        }
+
+        return true;
     }
 
     public async Task<bool> DeleteCharacterAsync(int charId, CancellationToken cancellationToken = default)
@@ -128,7 +186,7 @@ public sealed partial class CharacterRosterService(ICharacterRepository characte
         Level = LogLevel.Error,
         Message = "Failed to grant {Count} default skills to character {Name} ({CharId}) - character was created without them"
     )]
-    private partial void LogDefaultSkillsFailed(int count, string name, int charId);
+    private partial void LogDefaultSkillsFailed(Exception exception, int count, string name, int charId);
 
     [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "Character {CharId} already deleted")]
     private partial void LogAlreadyDeleted(int charId);
@@ -141,4 +199,13 @@ public sealed partial class CharacterRosterService(ICharacterRepository characte
 
     [LoggerMessage(EventId = 7, Level = LogLevel.Error, Message = "Error deleting character account")]
     private partial void LogDeleteFailed(Exception exception);
+
+    [LoggerMessage(EventId = 9, Level = LogLevel.Error, Message = "Failed to read the character list of account {AccountId}")]
+    private partial void LogCharacterListFailed(Exception exception, int accountId);
+
+    [LoggerMessage(EventId = 10, Level = LogLevel.Warning, Message = "Character {CharId} of account {AccountId} left out of the character list ({Error})")]
+    private partial void LogCharacterListEntrySkipped(int charId, int accountId, CharacterErrors error);
+
+    [LoggerMessage(EventId = 11, Level = LogLevel.Warning, Message = "Character {CharId} of account {AccountId} shares slot {Slot} with another character")]
+    private partial void LogCharacterListSlotConflict(int charId, byte slot, int accountId);
 }

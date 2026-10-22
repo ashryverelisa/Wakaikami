@@ -3,7 +3,8 @@
 public enum DataStage
 {
     TextFilter,
-    DefaultData,
     Maps,
     Character,
+
+    DefaultData,
 }

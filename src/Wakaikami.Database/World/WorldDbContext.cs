@@ -11,6 +11,7 @@ public class WorldDbContext(DbContextOptions<WorldDbContext> options) : Migratab
     public DbSet<CharacterShape> CharacterShapes => Set<CharacterShape>();
     public DbSet<CharacterStatPoints> CharacterStatPoints => Set<CharacterStatPoints>();
     public DbSet<CharacterTutorial> CharacterTutorials => Set<CharacterTutorial>();
+    public DbSet<CharacterSkill> CharacterSkills => Set<CharacterSkill>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,7 +25,10 @@ public class WorldDbContext(DbContextOptions<WorldDbContext> options) : Migratab
             entity.Property(x => x.Name).HasMaxLength(20);
             entity.Property(x => x.MapIndex).HasMaxLength(64);
             entity.Property(x => x.KqHandle).HasMaxLength(64);
-            entity.HasIndex(x => new { x.AccountId, x.Slot }).IsUnique();
+            // SQL Server has no unsigned bigint; keep the column BIGINT.
+            entity.Property(x => x.Exp).HasConversion<long>();
+            // Deleted characters keep their row, so only live characters compete for a slot.
+            entity.HasIndex(x => new { x.AccountId, x.Slot }).IsUnique().HasFilter("[IsDeleted] = 0");
         });
 
         modelBuilder.Entity<CharacterShape>(entity =>
@@ -57,6 +61,13 @@ public class WorldDbContext(DbContextOptions<WorldDbContext> options) : Migratab
             entity.HasKey(x => x.CharacterId);
             entity.Property(x => x.CharacterId).ValueGeneratedNever();
             entity.HasOne(x => x.Character).WithOne(c => c.Options).HasForeignKey<CharacterOptions>(x => x.CharacterId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<CharacterSkill>(entity =>
+        {
+            entity.ToTable("characterSkill");
+            entity.HasKey(x => new { x.CharacterId, x.SkillId });
+            entity.HasOne(x => x.Character).WithMany(c => c.Skills).HasForeignKey(x => x.CharacterId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
