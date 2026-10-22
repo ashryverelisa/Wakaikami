@@ -1,0 +1,32 @@
+﻿namespace Wakaikami.WorldService.Content.Entity.Character;
+
+public enum CharacterErrors : ushort
+{
+    None = 0,
+    Slot = 324,
+    Undermaintenance = 325,
+    ConnectWorldFail = 321,
+    ConnectMapFail = 323,
+    DataErr = 328,
+    LoginFail = 331,
+    Info = 1410,
+    Appearance = 1411,
+    Options = 1412,
+    Status = 1413,
+    Skills = 1414,
+    Quests = 1415,
+    House = 1416,
+    Friend = 1417,
+    MasterAndApprentice = 1418,
+    Guild = 1419,
+    Emblem = 1420,
+    Mover = 1421,
+    Area = 1422,
+    MarineBatter = 1423,
+    ReqIdNotMatch = 1424,
+    Item = 1425,
+    TreasureChest = 1426,
+    Title = 1427,
+    KingdomQuest = 1428,
+    ItemPremium = 1429,
+}

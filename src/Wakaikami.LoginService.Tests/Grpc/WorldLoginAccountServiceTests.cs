@@ -19,7 +19,7 @@ public sealed class WorldLoginAccountServiceTests
     private readonly IAccountPresence _presence = Substitute.For<IAccountPresence>();
     private readonly AccountTransferManager _transfers = new(new UpdateManager(), Substitute.For<IAccountPresence>());
 
-    private WorldLoginAccountService GetWorldLoginAccountService() => new(_accounts, _presence, _transfers, NullLogger<WorldLoginAccountService>.Instance);
+    private WorldLoginAccountService GetWorldLoginAccountService() => new(_presence, _transfers, NullLogger<WorldLoginAccountService>.Instance);
 
     [Fact]
     public async Task AccountOfflineReleasesTheReportingWorldsClaim()

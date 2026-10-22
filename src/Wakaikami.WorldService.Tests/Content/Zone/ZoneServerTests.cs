@@ -1,13 +1,11 @@
-using NSubstitute;
 using Wakaikami.Content.World.Enums;
 using Wakaikami.WorldService.Content.Zone;
-using Wakaikami.WorldService.Grpc.Interfaces;
 
 namespace Wakaikami.WorldService.Tests.Content.Zone;
 
 public sealed class ZoneServerTests
 {
-    private static ZoneServer NewZone(byte zoneId = 1) => new(zoneId, Substitute.For<IZonePushHub>());
+    private static ZoneServer NewZone(byte zoneId = 1) => new(zoneId);
 
     private static ZoneConnectInfo ConnectInfo(int nowPlayer = 0, ushort maxPlayer = 100, bool isTestServer = false) =>
         new()

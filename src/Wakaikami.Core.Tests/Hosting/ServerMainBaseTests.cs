@@ -65,7 +65,7 @@ public sealed class ServerMainBaseTests : IDisposable
     {
         var serverMain = CreateServerMain();
 
-        Assert.True(await serverMain.LoadGameServerModulesAsync());
+        Assert.True(await serverMain.LoadGameServerModulesAsync(TestContext.Current.CancellationToken));
         Assert.True(serverMain.LoadedGameServer);
     }
 

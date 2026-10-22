@@ -11,6 +11,7 @@ service WorldLoginAccount {
   rpc AccountOnlineList(AccountOnlineListRequest) returns (google.protobuf.Empty);
   rpc TransferGen(TransferGenRequest) returns (TransferGenReply);
   rpc TransferGet(TransferGetRequest) returns (TransferGetReply);
+  rpc CharacterCreate(CharacterCreateRequest) returns (google.protobuf.Empty);
 }
 
 message TransferGenRequest {
@@ -43,4 +44,8 @@ message TransferGetReply {
   bool found = 1;
   int32 account_id = 2;
   string account_name = 3;
+}
+
+message CharacterCreateRequest {
+  int32 account_id = 1;
 }

@@ -2,6 +2,7 @@
   <Folder Name="/Solution Items/">
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
+    <File Path=".editorconfig" />
   </Folder>
   <Folder Name="/Database/">
     <Project Path="Wakaikami.Database.Migrations/Wakaikami.Database.Migrations.csproj" />

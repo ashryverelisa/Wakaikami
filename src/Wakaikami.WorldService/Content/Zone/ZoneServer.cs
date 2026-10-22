@@ -1,10 +1,9 @@
 ﻿using Wakaikami.Content.World;
 using Wakaikami.Content.World.Enums;
-using Wakaikami.WorldService.Grpc.Interfaces;
 
 namespace Wakaikami.WorldService.Content.Zone;
 
-public class ZoneServer(byte zoneId, IZonePushHub pushHub)
+public class ZoneServer(byte zoneId)
 {
     private readonly Lock _threadLocker = new();
 

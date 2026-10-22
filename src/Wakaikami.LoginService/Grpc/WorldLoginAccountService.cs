@@ -9,12 +9,8 @@ using Wakaikami.Networking.Grpc.Messages.WorldLoginAccount;
 
 namespace Wakaikami.LoginService.Grpc;
 
-public sealed partial class WorldLoginAccountService(
-    IAccountManager accounts,
-    IAccountPresence presence,
-    AccountTransferManager transfers,
-    ILogger<WorldLoginAccountService> logger
-) : WorldLoginAccount.WorldLoginAccountBase
+public sealed partial class WorldLoginAccountService(IAccountPresence presence, AccountTransferManager transfers, ILogger<WorldLoginAccountService> logger)
+    : WorldLoginAccount.WorldLoginAccountBase
 {
     public override Task<Empty> AccountOffline(AccountOfflineRequest request, ServerCallContext context)
     {

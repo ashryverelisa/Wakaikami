@@ -14,7 +14,7 @@ public sealed class AccountManagerTests
     private readonly IAuthenticationService _authentication = Substitute.For<IAuthenticationService>();
     private readonly IAccountRepository _accountRepository = Substitute.For<IAccountRepository>();
 
-    private AccountManager GetAccountManager() => new(_authentication, _accountRepository, NullLogger<AccountManager>.Instance);
+    private AccountManager GetAccountManager() => new(_authentication, NullLogger<AccountManager>.Instance);
 
     [Theory]
     [InlineData(LoginStatus.Blocked, UserErrors.LoginBlocked)]

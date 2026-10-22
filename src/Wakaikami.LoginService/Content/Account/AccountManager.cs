@@ -1,13 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
-using Wakaikami.Database.Login.Repositories.Interfaces;
 using Wakaikami.LoginService.Content.Account.Interfaces;
 using Wakaikami.LoginService.Content.Account.Models;
 using Wakaikami.LoginService.GameNetwork.Protocol.User;
 
 namespace Wakaikami.LoginService.Content.Account;
 
-public sealed partial class AccountManager(IAuthenticationService authentication, IAccountRepository repository, ILogger<AccountManager> logger)
-    : IAccountManager
+public sealed partial class AccountManager(IAuthenticationService authentication, ILogger<AccountManager> logger) : IAccountManager
 {
     public async Task<(int accountId, UserErrors? error)> LoginAccountAsync(
         string userName,
